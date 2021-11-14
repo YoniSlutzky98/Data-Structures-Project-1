@@ -2,7 +2,7 @@
  *
  * AVLTree
  *
- * An implementation of aמ AVL Tree with
+ * An implementation of an AVL Tree with
  * distinct integer keys and info.
  *
  */
@@ -177,49 +177,70 @@ public class AVLTree {
     * This class can and MUST be modified (It must implement IAVLNode).
     */
   public class AVLNode implements IAVLNode{
-		public int getKey()
+		int key, height;
+		String value;
+		IAVLNode left, right, parent;
+		boolean real;
+		
+		public AVLNode(int k, String v, IAVLNode l, IAVLNode r, IAVLNode p) {
+			this.key = k;
+			this.value = v;
+			this.left = l;
+			this.right = r;
+			this.parent = p;
+			if (l == null & r == null) {
+				this.height = -1;
+				this.real = false;
+			}
+			else {
+				this.height = Math.max(l.getHeight(), r.getHeight()) + 1;
+				this.real = true;
+			}
+		}
+	  
+	  	public int getKey()
 		{
-			return 423; // to be replaced by student code
+			return this.key;
 		}
 		public String getValue()
 		{
-			return "getValueDefault"; // to be replaced by student code
+			return this.value;
 		}
 		public void setLeft(IAVLNode node)
 		{
-			return; // to be replaced by student code
+			this.left = node;
 		}
 		public IAVLNode getLeft()
 		{
-			return null; // to be replaced by student code
+			return this.left;
 		}
 		public void setRight(IAVLNode node)
 		{
-			return; // to be replaced by student code
+			this.right = node;
 		}
 		public IAVLNode getRight()
 		{
-			return null; // to be replaced by student code
+			return this.right;
 		}
 		public void setParent(IAVLNode node)
 		{
-			return; // to be replaced by student code
+			this.parent = node;	
 		}
 		public IAVLNode getParent()
 		{
-			return null; // to be replaced by student code
+			return this.parent;
 		}
 		public boolean isRealNode()
 		{
-			return true; // to be replaced by student code
+			return this.real;
 		}
 	    public void setHeight(int height)
 	    {
-	      return; // to be replaced by student code
+	    	this.height = height;
 	    }
 	    public int getHeight()
 	    {
-	      return 424; // to be replaced by student code
+	      return this.height;
 	    }
   }
 
