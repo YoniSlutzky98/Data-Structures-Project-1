@@ -180,21 +180,19 @@ public class AVLTree {
 		int key, height;
 		String value;
 		IAVLNode left, right, parent;
-		boolean real;
 		
 		public AVLNode(int k, String v, IAVLNode l, IAVLNode r, IAVLNode p) {
-			this.key = k;
-			this.value = v;
 			this.left = l;
 			this.right = r;
 			this.parent = p;
 			if (l == null & r == null) {
 				this.height = -1;
-				this.real = false;
+				this.key = -1;
 			}
 			else {
 				this.height = Math.max(l.getHeight(), r.getHeight()) + 1;
-				this.real = true;
+				this.key = k;
+				this.value = v;
 			}
 		}
 	  
@@ -232,7 +230,7 @@ public class AVLTree {
 		}
 		public boolean isRealNode()
 		{
-			return this.real;
+			return this.key > -1;
 		}
 	    public void setHeight(int height)
 	    {
