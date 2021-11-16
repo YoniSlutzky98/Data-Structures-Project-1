@@ -1,25 +1,15 @@
 AVLTree:
-write static virtual node
-write fields
-implement empty()
-implement helper search() (returns node)
-implement search() (returns value)
 implement helper rotateRight()
 implement helper rotateLeft()
 implement insert()
 implement delete()
-implement min() - O(1) with extra space?
-implement max() - O(1) with extra space?
-implement helper inOrderTraversal()
-implement keysToArray()
-implement infoToArray()
-implement size() - O(1) with extra space?
-implement getRoot()
+discuss min() - O(1) with extra space?
+discuss max() - O(1) with extra space?
 implement split()
 implement join()
 
 IAVLNode:
-implement factory?
+Done
 
 AVLNode:
 Done
