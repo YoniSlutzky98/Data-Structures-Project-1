@@ -177,10 +177,15 @@ public class AVLTree {
     * This class can and MUST be modified (It must implement IAVLNode).
     */
   public class AVLNode implements IAVLNode{
-		int key, height;
+		int key, height; // Each node holds a key, a value, its height, its sons and its parent
 		String value;
 		IAVLNode left, right, parent;
 		
+		
+		/*
+		 * A constructor for an AVLNode. O(1) complexity.
+		 * Special case - the node is a virtual one (hence its l and r sons are null)
+		 */
 		public AVLNode(int k, String v, IAVLNode l, IAVLNode r, IAVLNode p) {
 			this.left = l;
 			this.right = r;
@@ -196,47 +201,90 @@ public class AVLTree {
 			}
 		}
 	  
+		/*
+		 * Returns the key of an AVLNode. O(1) complexity.
+		 */
 	  	public int getKey()
 		{
 			return this.key;
 		}
+	  	
+		/*
+		 * Returns the value of an AVLNode. O(1) complexity.
+		 */	  	
 		public String getValue()
 		{
 			return this.value;
 		}
+		
+		/*
+		 * Sets the left child of an AVLNode. O(1) complexity.
+		 */
 		public void setLeft(IAVLNode node)
 		{
 			this.left = node;
 		}
+		
+		/*
+		 * Returns the left child of an AVLNode. O(1) complexity.
+		 */
 		public IAVLNode getLeft()
 		{
 			return this.left;
 		}
+		
+		/*
+		 * Sets the right child of an AVLNode. O(1) complexity.
+		 */
 		public void setRight(IAVLNode node)
 		{
 			this.right = node;
 		}
+		
+		/*
+		 * Returns the right child of an AVLNode. O(1) complexity.
+		 */
 		public IAVLNode getRight()
 		{
 			return this.right;
 		}
+		
+		/*
+		 * Sets the parent of an AVLNode. O(1) complexity.
+		 */
 		public void setParent(IAVLNode node)
 		{
 			this.parent = node;	
 		}
+		
+		/*
+		 * Returns the parent of an AVLNode. O(1) complexity.
+		 */
 		public IAVLNode getParent()
 		{
 			return this.parent;
 		}
+		
+		/*
+		 * Returns true if the node isn't virtual. O(1) complexity.
+		 */
 		public boolean isRealNode()
 		{
 			return this.key > -1;
 		}
-	    public void setHeight(int height)
+	    
+		/*
+		 * Sets the height of an AVLNode. O(1) complexity.
+		 */
+		public void setHeight(int height)
 	    {
 	    	this.height = height;
 	    }
-	    public int getHeight()
+	    
+		/*
+		 * Returns the height of an AVLNode. O(1) complexity.
+		 */
+		public int getHeight()
 	    {
 	      return this.height;
 	    }
