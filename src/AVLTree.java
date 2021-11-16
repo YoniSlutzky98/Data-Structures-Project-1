@@ -8,26 +8,63 @@
  */
 
 public class AVLTree {
-
+	IAVLNode VIRTUAL_NODE = new AVLNode(-1, null, null, null, null);
+	IAVLNode root;
+	int count;
+	
+	/*
+	 * Constructor for an AVL tree. Complexity O(1).
+	 */
+	public void AVLTree() {
+		this.root = null;
+		this.count = 0;
+	}
+	
   /**
    * public boolean empty()
    *
    * Returns true if and only if the tree is empty.
-   *
+   * Complexity O(1).
    */
   public boolean empty() {
-    return false; // to be replaced by student code
+	  return this.root == null;
   }
 
+  /*
+   * Returns the IAVLNode whose key is k, in the sub-tree whose root is node. 
+   * If such IAVLNode doesn't exist in the sub-tree, returns null
+   * Complexity O(log n). 
+   */
+  private IAVLNode nodeSearch(int k, IAVLNode node) {
+	  if (node == VIRTUAL_NODE) {
+		  return null;
+	  }
+	  if (node.getKey() == k) {
+		  return node;
+	  }
+	  else if (node.getKey() > k) {
+		  return nodeSearch(k, node.getLeft());
+	  }
+	  else {
+		  return nodeSearch(k, node.getRight());
+	  }
+  }
+  
  /**
    * public String search(int k)
    *
    * Returns the info of an item with key k if it exists in the tree.
    * otherwise, returns null.
+   * Uses the nodeSearch helper function.
+   * Complexity O(log n)
    */
   public String search(int k)
   {
-	return "searchDefaultString";  // to be replaced by student code
+	IAVLNode searchedNode = this.nodeSearch(k, this.root);
+	if (searchedNode == null) {
+		return null;
+	}
+	return searchedNode.getValue();
   }
 
   /**
@@ -40,7 +77,9 @@ public class AVLTree {
    * Returns -1 if an item with key k already exists in the tree.
    */
    public int insert(int k, String i) {
-	  return 420;	// to be replaced by student code
+	   this.count++; // Increase node count. 
+	   
+	   return 420;	// to be replaced by student code
    }
 
   /**
@@ -54,6 +93,7 @@ public class AVLTree {
    */
    public int delete(int k)
    {
+	   this.count--; // Decrease node count.
 	   return 421;	// to be replaced by student code
    }
 
@@ -62,10 +102,18 @@ public class AVLTree {
     *
     * Returns the info of the item with the smallest key in the tree,
     * or null if the tree is empty.
+    * Complexity O(log n)
     */
    public String min()
    {
-	   return "minDefaultString"; // to be replaced by student code
+	   if (this.empty()) {
+		   return null;
+	   }
+	   IAVLNode dummy = this.root;
+	   while (dummy.getLeft() != VIRTUAL_NODE) {
+		   dummy = dummy.getLeft();
+	   }
+	   return dummy.getValue();
    }
 
    /**
@@ -73,53 +121,117 @@ public class AVLTree {
     *
     * Returns the info of the item with the largest key in the tree,
     * or null if the tree is empty.
+    * Complexity O(log n).
     */
    public String max()
    {
-	   return "maxDefaultString"; // to be replaced by student code
+	   if (this.empty()) {
+		   return null;
+	   }
+	   IAVLNode dummy = this.root;
+	   while (dummy.getRight() != VIRTUAL_NODE) {
+		   dummy = dummy.getRight();
+	   }
+	   return dummy.getValue();
    }
 
-  /**
+   /*
+    * Helper function for keysToArray().
+    * Inserts the keys inorder to arr.
+    * Returns the pointer after making the insertions (so we could keep track of where
+    * to insert).
+    * Complexity O(n) (each node is visited once, constant work in each node)
+    */
+   private int inorderKeys(IAVLNode node, int[] arr, int pointer){
+	   if (node.getLeft() != VIRTUAL_NODE) {
+		   pointer = inorderKeys(node.getLeft(), arr, pointer);
+	   }
+	   arr[pointer] = node.getKey();
+	   pointer++;
+	   if (node.getRight() != VIRTUAL_NODE) {
+		   pointer = inorderKeys(node.getRight(), arr, pointer);
+	   }
+	   return pointer;
+   }
+   
+   
+   /**
    * public int[] keysToArray()
    *
    * Returns a sorted array which contains all keys in the tree,
    * or an empty array if the tree is empty.
+   * Complexity O(n).
    */
   public int[] keysToArray()
   {
-        return new int[33]; // to be replaced by student code
+	  if (this.empty()) {
+		  return new int[] {};
+	  }
+	  int[] arr = new int[this.count];
+	  this.inorderKeys(this.root, arr, 0);
+	  return arr;
   }
-
+ 
+  /*
+   * Helper function for infoToArray().
+   * Inserts the values inorder to arr.
+   * Returns the pointer after making the insertions (so we could keep track of where
+   * to insert).
+   * Complexity O(n) (each node is visited once, constant work in each node).
+   */
+  private int inorderValues(IAVLNode node, String[] arr, int pointer){
+	   if (node.getLeft() != VIRTUAL_NODE) {
+		   pointer = inorderValues(node.getLeft(), arr, pointer);
+	   }
+	   arr[pointer] = node.getValue();
+	   pointer++;
+	   if (node.getRight() != VIRTUAL_NODE) {
+		   pointer = inorderValues(node.getRight(), arr, pointer);
+	   }
+	   return pointer;
+  }
+  
   /**
    * public String[] infoToArray()
    *
    * Returns an array which contains all info in the tree,
    * sorted by their respective keys,
    * or an empty array if the tree is empty.
+   * Complexity O(n).
    */
   public String[] infoToArray()
   {
-        return new String[55]; // to be replaced by student code
+	  if (this.empty()) {
+		  return new String[] {};
+	  }
+	  String[] arr = new String[this.count];
+	  this.inorderValues(this.root, arr, 0);
+	  return arr;
   }
 
    /**
     * public int size()
     *
     * Returns the number of nodes in the tree.
+    * Complexity O(1).
     */
    public int size()
    {
-	   return 422; // to be replaced by student code
+	   return this.count;
    }
    
    /**
     * public int getRoot()
     *
     * Returns the root AVL node, or null if the tree is empty
+    * Complexity O(1).
     */
    public IAVLNode getRoot()
    {
-	   return null;
+	   if (this.empty()) {
+		   return null;
+	   }
+	   return this.root;
    }
    
    /**
