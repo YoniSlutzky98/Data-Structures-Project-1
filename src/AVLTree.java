@@ -10,14 +10,14 @@
 public class AVLTree {
 	IAVLNode VIRTUAL_NODE = new AVLNode(-1, null, null, null, null);
 	IAVLNode root, min, max;
-	int count;
+	int size;
 	
 	/*
 	 * Constructor for an AVL tree. Complexity O(1).
 	 */
 	public AVLTree() {
 		this.root = this.min = this.max = VIRTUAL_NODE;
-		this.count = 0;
+		this.size = 0;
 	}
 	
   /**
@@ -33,7 +33,7 @@ public class AVLTree {
   /*
    * Helper function for search().
    * Returns the IAVLNode whose key is k, in the sub-tree whose root is node. 
-   * If such IAVLNode doesn't exist in the sub-tree, returns null
+   * If such IAVLNode doesn't exist in the sub-tree, returns null.
    * Complexity O(log n). 
    */
   private IAVLNode nodeSearch(int k, IAVLNode node) {
@@ -59,7 +59,7 @@ public class AVLTree {
    * Uses the nodeSearch helper function.
    * Complexity O(log n)
    */
-  public String search(int k)
+  public String search(int k) // TO DO - fix according to helper function
   {
 	IAVLNode searchedNode = this.nodeSearch(k, this.root);
 	if (searchedNode == null) {
@@ -78,7 +78,7 @@ public class AVLTree {
    * Returns -1 if an item with key k already exists in the tree.
    */
    public int insert(int k, String i) {
-	   this.count++; // Increase node count. 
+	   this.size++; // Increase node count. 
 	   
 	   return 420;	// to be replaced by student code
    }
@@ -94,7 +94,7 @@ public class AVLTree {
    */
    public int delete(int k)
    {
-	   this.count--; // Decrease node count.
+	   this.size--; // Decrease node count.
 	   return 421;	// to be replaced by student code
    }
 
@@ -103,7 +103,7 @@ public class AVLTree {
     *
     * Returns the info of the item with the smallest key in the tree,
     * or null if the tree is empty.
-    * Complexity O(1)
+    * Complexity O(1).
     */
    public String min()
    {
@@ -127,7 +127,7 @@ public class AVLTree {
     * Inserts the keys inorder to arr.
     * Returns the pointer after making the insertions (so we could keep track of where
     * to insert).
-    * Complexity O(n) (each node is visited once, constant work in each node)
+    * Complexity O(n) (each node is visited once, constant work in each node).
     */
    private int inorderKeys(IAVLNode node, int[] arr, int pointer){
 	   if (node.getLeft() != VIRTUAL_NODE) {
@@ -154,7 +154,7 @@ public class AVLTree {
 	  if (this.empty()) {
 		  return new int[] {};
 	  }
-	  int[] arr = new int[this.count];
+	  int[] arr = new int[this.size];
 	  this.inorderKeys(this.root, arr, 0);
 	  return arr;
   }
@@ -191,7 +191,7 @@ public class AVLTree {
 	  if (this.empty()) {
 		  return new String[] {};
 	  }
-	  String[] arr = new String[this.count];
+	  String[] arr = new String[this.size];
 	  this.inorderValues(this.root, arr, 0);
 	  return arr;
   }
@@ -204,7 +204,7 @@ public class AVLTree {
     */
    public int size()
    {
-	   return this.count;
+	   return this.size;
    }
    
    /**
