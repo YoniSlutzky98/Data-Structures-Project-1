@@ -1,18 +1,18 @@
-AVLTree:
-implement helper rotateRight()
-implement helper rotateLeft()
-implement insert()
-implement delete()
-discuss min() - O(1) with extra space?
-discuss max() - O(1) with extra space?
+class AVLTree:
+implement helper successor() - guy
+implement helper rotate() - takes son node - yoni
+implement helper insertRebalance() - takes inserted node 
+implement insert() - BST insertion + rebalancing
+implement deleteRebalance() ?
+implement delete() - BST deletion + rebalancing
 implement split()
 implement join()
 
-IAVLNode:
+class IAVLNode:
 Done
 
-AVLNode:
+class AVLNode:
 Done
 
-Tester:
+class Tester:
 Create and run
