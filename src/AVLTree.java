@@ -33,21 +33,32 @@ public class AVLTree {
   /*
    * Helper function for search().
    * Returns the IAVLNode whose key is k, in the sub-tree whose root is node. 
-   * If such IAVLNode doesn't exist in the sub-tree, returns null.
+   * If such IAVLNode doesn't exist in the sub-tree, returns the last node encountered.
+   * Special case - the tree is empty, for which we'll return null.
    * Complexity O(log n). 
    */
   private IAVLNode nodeSearch(int k, IAVLNode node) {
-	  if (node == VIRTUAL_NODE) {
+	  if (node == VIRTUAL_NODE) { // Edge case for when the tree is empty.
 		  return null;
 	  }
-	  if (node.getKey() == k) {
+	  if (node.getKey() == k) { // Found k
 		  return node;
 	  }
-	  else if (node.getKey() > k) {
-		  return nodeSearch(k, node.getLeft());
+	  else if (node.getKey() > k) { // k is lesser than current node
+		  if (node.getLeft() == VIRTUAL_NODE) { // If k doesn't exist in the tree
+			  return node;
+		  }
+		  else {
+			  return nodeSearch(k, node.getLeft()); // Go left
+		  }
 	  }
-	  else {
-		  return nodeSearch(k, node.getRight());
+	  else { // k is greater than current node
+		  if (node.getRight() == VIRTUAL_NODE) { // If k doesn't exist in the tree 
+			  return node;
+		  }
+		  else {
+			  return nodeSearch(k, node.getRight()); // Go right
+		  }
 	  }
   }
   
@@ -59,10 +70,13 @@ public class AVLTree {
    * Uses the nodeSearch helper function.
    * Complexity O(log n)
    */
-  public String search(int k) // TO DO - fix according to helper function
+  public String search(int k)
   {
+	if (this.empty()) { // If the tree is empty
+		return null;
+	}
 	IAVLNode searchedNode = this.nodeSearch(k, this.root);
-	if (searchedNode == null) {
+	if (searchedNode.getKey() != k) { // To make sure the node exists in the tree 
 		return null;
 	}
 	return searchedNode.getValue();
