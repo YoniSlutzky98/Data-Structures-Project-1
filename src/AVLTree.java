@@ -9,14 +9,14 @@
 
 public class AVLTree {
 	IAVLNode VIRTUAL_NODE = new AVLNode(-1, null, null, null, null);
-	IAVLNode root;
+	IAVLNode root, min, max;
 	int count;
 	
 	/*
 	 * Constructor for an AVL tree. Complexity O(1).
 	 */
-	public void AVLTree() {
-		this.root = null;
+	public AVLTree() {
+		this.root = this.min = this.max = VIRTUAL_NODE;
 		this.count = 0;
 	}
 	
@@ -27,10 +27,11 @@ public class AVLTree {
    * Complexity O(1).
    */
   public boolean empty() {
-	  return this.root == null;
+	  return this.root == VIRTUAL_NODE;
   }
 
   /*
+   * Helper function for search().
    * Returns the IAVLNode whose key is k, in the sub-tree whose root is node. 
    * If such IAVLNode doesn't exist in the sub-tree, returns null
    * Complexity O(log n). 
@@ -102,18 +103,11 @@ public class AVLTree {
     *
     * Returns the info of the item with the smallest key in the tree,
     * or null if the tree is empty.
-    * Complexity O(log n)
+    * Complexity O(1)
     */
    public String min()
    {
-	   if (this.empty()) {
-		   return null;
-	   }
-	   IAVLNode dummy = this.root;
-	   while (dummy.getLeft() != VIRTUAL_NODE) {
-		   dummy = dummy.getLeft();
-	   }
-	   return dummy.getValue();
+	   return this.min.getValue();
    }
 
    /**
@@ -121,18 +115,11 @@ public class AVLTree {
     *
     * Returns the info of the item with the largest key in the tree,
     * or null if the tree is empty.
-    * Complexity O(log n).
+    * Complexity O(1).
     */
    public String max()
    {
-	   if (this.empty()) {
-		   return null;
-	   }
-	   IAVLNode dummy = this.root;
-	   while (dummy.getRight() != VIRTUAL_NODE) {
-		   dummy = dummy.getRight();
-	   }
-	   return dummy.getValue();
+	   return this.max.getValue();
    }
 
    /*
