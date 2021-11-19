@@ -82,6 +82,23 @@ public class AVLTree {
 	return searchedNode.getValue();
   }
 
+  /*
+   * Helper function for insertRebalance() & deleteRebalance().
+   * Given a child node, rotates the child and its parent.
+   * Complexity O(1).
+   */
+  private void rotate(IAVLNode c) {
+	  IAVLNode p = c.getParent();
+	  if (p.getRight() == c) {
+		  p.setRight(c.getLeft());
+		  c.setLeft(p);
+	  }
+	  else {
+		  p.setLeft(c.getRight());
+		  c.setRight(p);
+	  }
+  }
+  
   /**
    * public int insert(int k, String i)
    *
