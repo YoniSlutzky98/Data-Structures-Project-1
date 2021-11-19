@@ -1,10 +1,8 @@
 class AVLTree:
-implement helper successor() - guy
-implement helper rotate() - takes son node - yoni
 implement helper insertRebalance() - takes inserted node 
-implement insert() - BST insertion + rebalancing
-implement deleteRebalance() ?
-implement delete() - BST deletion + rebalancing
+implement insert() - BST insertion + rebalancing + size updates + min/max updates
+implement deleteRebalance() - takes parent node
+implement delete() - BST deletion + rebalancing + size updates + min/max updates
 implement split()
 implement join()
 
