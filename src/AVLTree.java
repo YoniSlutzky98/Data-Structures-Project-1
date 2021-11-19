@@ -33,21 +33,32 @@ public class AVLTree {
   /**
    * Helper function for search().
    * Returns the IAVLNode whose key is k, in the sub-tree whose root is node. 
-   * If such IAVLNode doesn't exist in the sub-tree, returns null.
+   * If such IAVLNode doesn't exist in the sub-tree, returns the last node encountered.
+   * Special case - the tree is empty, for which we'll return null.
    * Complexity O(log n). 
    */
   private IAVLNode nodeSearch(int k, IAVLNode node) {
-	  if (node == VIRTUAL_NODE) {
+	  if (node == VIRTUAL_NODE) { // Edge case for when the tree is empty.
 		  return null;
 	  }
-	  if (node.getKey() == k) {
+	  if (node.getKey() == k) { // Found k
 		  return node;
 	  }
-	  else if (node.getKey() > k) {
-		  return nodeSearch(k, node.getLeft());
+	  else if (node.getKey() > k) { // k is lesser than current node
+		  if (node.getLeft() == VIRTUAL_NODE) { // If k doesn't exist in the tree
+			  return node;
+		  }
+		  else {
+			  return nodeSearch(k, node.getLeft()); // Go left
+		  }
 	  }
-	  else {
-		  return nodeSearch(k, node.getRight());
+	  else { // k is greater than current node
+		  if (node.getRight() == VIRTUAL_NODE) { // If k doesn't exist in the tree 
+			  return node;
+		  }
+		  else {
+			  return nodeSearch(k, node.getRight()); // Go right
+		  }
 	  }
   }
 
@@ -57,7 +68,10 @@ public class AVLTree {
 	 * Complexity O(log n).
 	 */
 	private IAVLNode findSuccessor(IAVLNode node) {
-		if (node.getRight() != null) { // if our node has right son, it is not max and his successor is in its right subtree.
+		if (node == this.max) { // this node is the maximum so it has not successor
+			return null;
+		}
+		if (node.getRight() != VIRTUAL_NODE) { // if our node has right son, it is not max and his successor is in its right subtree.
 			node = node.getRight();
 			while (node.getLeft() != VIRTUAL_NODE) {
 				node = node.getLeft();
@@ -71,11 +85,6 @@ public class AVLTree {
 				node = parentNode;
 				parentNode = node.getParent();
 			}
-
-			if (parentNode == VIRTUAL_NODE) { // this node is the maximum so it has not successor
-				return null;
-			}
-
 			return parentNode;
 		}
 	}
@@ -88,15 +97,35 @@ public class AVLTree {
    * Uses the nodeSearch helper function.
    * Complexity O(log n)
    */
-  public String search(int k) // TODO - fix according to helper function
+  public String search(int k)
   {
+	if (this.empty()) { // If the tree is empty
+		return null;
+	}
 	IAVLNode searchedNode = this.nodeSearch(k, this.root);
-	if (searchedNode == null) {
+	if (searchedNode.getKey() != k) { // To make sure the node exists in the tree 
 		return null;
 	}
 	return searchedNode.getValue();
   }
 
+  /*
+   * Helper function for insertRebalance() & deleteRebalance().
+   * Given a child node, rotates the child and its parent.
+   * Complexity O(1).
+   */
+  private void rotate(IAVLNode c) {
+	  IAVLNode p = c.getParent();
+	  if (p.getRight() == c) {
+		  p.setRight(c.getLeft());
+		  c.setLeft(p);
+	  }
+	  else {
+		  p.setLeft(c.getRight());
+		  c.setRight(p);
+	  }
+  }
+  
   /**
    * public int insert(int k, String i)
    *
