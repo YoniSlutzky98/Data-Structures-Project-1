@@ -30,7 +30,7 @@ public class AVLTree {
 	  return this.root == VIRTUAL_NODE;
   }
 
-  /*
+  /**
    * Helper function for search().
    * Returns the IAVLNode whose key is k, in the sub-tree whose root is node. 
    * If such IAVLNode doesn't exist in the sub-tree, returns the last node encountered.
@@ -61,6 +61,33 @@ public class AVLTree {
 		  }
 	  }
   }
+
+	/**
+	 * @ret IAVL Node
+	 * @abst finds the successor of a given IAVL Node
+	 * Complexity O(log n).
+	 */
+	private IAVLNode findSuccessor(IAVLNode node) {
+		if (node == this.max) { // this node is the maximum so it has not successor
+			return null;
+		}
+		if (node.getRight() != VIRTUAL_NODE) { // if our node has right son, it is not max and his successor is in its right subtree.
+			node = node.getRight();
+			while (node.getLeft() != VIRTUAL_NODE) {
+				node = node.getLeft();
+			}
+			return node;
+		}
+
+		else { // has no right children
+			IAVLNode parentNode = node.getParent();
+			while (parentNode != VIRTUAL_NODE && node == parentNode.getRight()) { // go up the tree to find the first parent that our node is it's left son
+				node = parentNode;
+				parentNode = node.getParent();
+			}
+			return parentNode;
+		}
+	}
   
  /**
    * public String search(int k)
@@ -384,7 +411,7 @@ public class AVLTree {
 		 */
 		public void setParent(IAVLNode node)
 		{
-			this.parent = node;	
+			this.parent = node;
 		}
 		
 		/*
@@ -408,7 +435,7 @@ public class AVLTree {
 		 */
 		public void setHeight(int height)
 	    {
-	    	this.height = height;
+			this.height = height;
 	    }
 	    
 		/*
