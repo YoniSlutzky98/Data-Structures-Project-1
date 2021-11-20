@@ -256,9 +256,21 @@ public class AVLTree {
    * Returns the number of re-balancing operations, or 0 if no re-balancing operations were necessary.
    * A promotion/rotation counts as one re-balance operation, double-rotation is counted as 2.
    * Returns -1 if an item with key k was not found in the tree.
+   * Deletion 2 easy cases: 1. leaf - simple removal; 2. unary - bypass
+   * Deletion complicated case: "healthy" node - find its successor (it has a right node!), replace the node with its
+   * successor and bypass its original place in the tree (unary node).
    */
    public int delete(int k)
    {
+//	   if (this.root == VIRTUAL_NODE) { // Special case when the tree is empty.
+//		   return -1;
+//	   }
+//
+//	   IAVLNode targetNode = nodeSearch(k, this.root); // find the node to delete
+
+
+
+
 	   this.size--; // Decrease node count.
 	   return 421;	// to be replaced by student code
    }
