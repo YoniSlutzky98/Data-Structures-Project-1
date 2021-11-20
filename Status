@@ -1,8 +1,6 @@
-class AVLTree:
-implement helper insertRebalance() - takes inserted node 
-implement insert() - BST insertion + rebalancing + size updates + min/max updates
-implement deleteRebalance() - takes parent node
-implement delete() - BST deletion + rebalancing + size updates + min/max updates
+class AVLTree:updates
+implement deleteRebalance() - takes parent node, updates size
+implement delete() - BST deletion + rebalancing + min/max updates
 implement split()
 implement join()
 
