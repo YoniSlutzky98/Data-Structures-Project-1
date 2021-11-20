@@ -119,12 +119,88 @@ public class AVLTree {
 	  if (p.getRight() == c) {
 		  p.setRight(c.getLeft());
 		  c.setLeft(p);
+		  c.setParent(p.getParent());
+		  p.setParent(c);
 	  }
 	  else {
 		  p.setLeft(c.getRight());
 		  c.setRight(p);
+		  c.setParent(p.getParent());
+		  p.setParent(c);
 	  }
   }
+  
+  /*
+   * Helper function for insert().
+   * Given inserted node, re-balance the tree up-to the root.
+   * Return # of re-balance operations made.
+   * Complexity O(logn). 
+   */
+  private int insertRebalance(IAVLNode node) {
+	IAVLNode p = node.getParent();
+	if (p == null) { // Got to the root, no more re-balances needed.
+		return 0;
+	}
+	else {
+		if (p.getHeight() == node.getHeight()) { // If there exists a problem in the tree 
+			if (p.getLeft() == node) { // If the inserted node was to the left
+				IAVLNode other = p.getRight();
+				if (p.getHeight() == other.getHeight() + 1) { // If the other node has a diff. of 1
+					p.setHeight(p.getHeight() + 1); // Promote parent and re-balance upwards
+					return 1 + insertRebalance(p);
+				}
+				else {
+					IAVLNode l = node.getLeft();
+					IAVLNode r = node.getRight();
+					// If the node is a (1,2) node
+					if (node.getHeight() == l.getHeight() + 1 && node.getHeight() == r.getHeight() + 2) {
+						p.setHeight(p.getHeight()-1); // Demote parent
+						node.setHeight(node.getHeight()+1); // Promote node
+						rotate(node); // Rotate to the right
+						return 3; // Problem solved
+					}
+					else { // If the node is a (2,1) node
+						p.setHeight(p.getHeight()-1); // Demote parent
+						node.setHeight(node.getHeight()-1); // Demote node
+						r.setHeight(r.getHeight()+1); // Promte node.right()
+						rotate(r); // Rotate to the left
+						rotate(r); // Rotate to the right
+						return 5; // Problem solved
+					}
+				}
+			}
+			else { // If the inserted node was to the left
+				IAVLNode other = p.getLeft();
+				if (p.getHeight() == other.getHeight() + 1) { // If the other node has a diff. of 1
+					p.setHeight(p.getHeight() + 1); // Promote parent and re-balance upwards
+					return 1 + insertRebalance(p);  
+				}
+				else {
+					IAVLNode l = node.getLeft();
+					IAVLNode r = node.getRight();
+					// If the node is a (2,1) node
+					if (node.getHeight() == l.getHeight() + 2 && node.getHeight() == r.getHeight() + 1) {
+						p.setHeight(p.getHeight()-1); // Demote parent
+						node.setHeight(node.getHeight()+1); // Promote node
+						rotate(node); // Rotate to the left
+						return 3; // Problem solved
+					}
+					else { // If the node is a (1,2) node 
+						p.setHeight(p.getHeight()-1); // Demote parent
+						node.setHeight(node.getHeight()-1); // Demote node
+						l.setHeight(l.getHeight()+1); // Promote node.left()
+						rotate(l); // Rotate to the right
+						rotate(l); // Rotate to the left
+						return 5; // Problem solved
+					}
+				}
+			}
+		}
+		else { // If there's no problem
+			return 0;
+		}
+	}
+ }
   
   /**
    * public int insert(int k, String i)
@@ -134,11 +210,42 @@ public class AVLTree {
    * Returns the number of re-balancing operations, or 0 if no re-balancing operations were necessary.
    * A promotion/rotation counts as one re-balance operation, double-rotation is counted as 2.
    * Returns -1 if an item with key k already exists in the tree.
+   * Complexity O(logn).
    */
    public int insert(int k, String i) {
-	   this.size++; // Increase node count. 
-	   
-	   return 420;	// to be replaced by student code
+	   if (this.root == VIRTUAL_NODE) { // Special case for insertion when tree is empty.
+		   this.root = new AVLNode(k, i, VIRTUAL_NODE, VIRTUAL_NODE, null);
+		   this.size++; // Increase node count
+		   return 0;
+	   }
+	   IAVLNode parent = nodeSearch(k, this.root); // Find where to insert
+	   if (parent.getKey() == k) { // Make sure key isn't in tree
+		   return -1;
+	   }
+	   else {
+		   boolean notLeaf = (parent.getLeft() != VIRTUAL_NODE | parent.getRight() != VIRTUAL_NODE);
+		   this.size++; // Increase node count
+		   IAVLNode child = new AVLNode(k, i, VIRTUAL_NODE, VIRTUAL_NODE, parent); // Create new node
+		   if (parent.getKey() > k) { // Insert on the right side of parent
+			   parent.setLeft(child); 
+		   }
+		   else {
+			   parent.setRight(child);
+		   }
+		   if (this.max.getKey() < child.getKey()) { // Update max
+			   this.max = child;
+		   }
+		   if (this.min.getKey() > child.getKey()) { // Update min
+			   this.min = child;
+		   }
+		   if (notLeaf) { // If parent wasn't a leaf, the tree doesn't need re-balancing 
+			   return 0;
+		   }
+		   else { // Otherwise, re-balance it
+			   int rebalances = this.insertRebalance(child);
+			   return rebalances;
+		   }
+	   } 	   
    }
 
   /**
