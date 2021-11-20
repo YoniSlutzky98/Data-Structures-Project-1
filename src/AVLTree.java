@@ -8,7 +8,7 @@
  */
 
 public class AVLTree {
-	IAVLNode VIRTUAL_NODE = new AVLNode(-1, null, null, null, null);
+	IAVLNode VIRTUAL_NODE = new AVLNode(-1, null, null, null, null); // VE's parents won't be maintained
 	IAVLNode root, min, max;
 	int size;
 	
@@ -226,7 +226,7 @@ public class AVLTree {
 		   boolean notLeaf = (parent.getLeft() != VIRTUAL_NODE | parent.getRight() != VIRTUAL_NODE);
 		   this.size++; // Increase node count
 		   IAVLNode child = new AVLNode(k, i, VIRTUAL_NODE, VIRTUAL_NODE, parent); // Create new node
-		   if (parent.getKey() > k) { // Insert on the right side of parent
+		   if (parent.getKey() > k) { // Insert on the left side of parent
 			   parent.setLeft(child); 
 		   }
 		   else {
