@@ -62,6 +62,39 @@ public class AVLTree {
 	  }
   }
 
+  private boolean isLeftSon(IAVLNode targetNode) {
+	  IAVLNode targetNodeParent = targetNode.getParent();
+	  if (targetNodeParent == null) { // node is root
+		  return false;
+	  }
+	  return targetNodeParent.getLeft().getKey() == targetNode.getKey(); // return true if the target node is a left son of his parent, false otherwise.
+  }
+
+	private boolean isRightSon(IAVLNode targetNode) {
+		IAVLNode targetNodeParent = targetNode.getParent();
+		if (targetNodeParent == null) { // node is root
+			return false;
+		}
+		return targetNodeParent.getRight().getKey() == targetNode.getKey(); // return true if the target node is a right son of his parent, false otherwise.
+	}
+
+	private boolean isLeaf(IAVLNode targetNode) {
+	  		return targetNode.getRight() == VIRTUAL_NODE && targetNode.getLeft() == VIRTUAL_NODE;
+	}
+
+	private boolean isRoot(IAVLNode targetNode) {
+		return targetNode.getParent() == null;
+	}
+
+	private boolean isUnaryRight(IAVLNode targetNode) {
+	  return targetNode.getRight() != VIRTUAL_NODE && targetNode.getLeft() == VIRTUAL_NODE;
+	}
+
+	private boolean isUnaryLeft(IAVLNode targetNode) {
+		return targetNode.getRight() == VIRTUAL_NODE && targetNode.getLeft() != VIRTUAL_NODE;
+	}
+
+
 	/**
 	 * @ret IAVL Node
 	 * @abst finds the successor of a given IAVL Node
@@ -88,6 +121,7 @@ public class AVLTree {
 			return parentNode;
 		}
 	}
+
   
  /**
    * public String search(int k)
@@ -262,11 +296,105 @@ public class AVLTree {
    */
    public int delete(int k)
    {
-//	   if (this.root == VIRTUAL_NODE) { // Special case when the tree is empty.
-//		   return -1;
-//	   }
-//
-//	   IAVLNode targetNode = nodeSearch(k, this.root); // find the node to delete
+	   if (this.root == VIRTUAL_NODE) { // Special case when the tree is empty.
+		   return -1;
+	   }
+
+	   IAVLNode targetNode = nodeSearch(k, this.root); // find the node to delete
+	   if (targetNode.getKey() != k) { // if key does not exist, return -1
+		   return -1;
+	   }
+
+	   if (isLeaf(targetNode)) { // target node is a leaf
+		   if (isRoot(targetNode)) {
+			   this.root = VIRTUAL_NODE;
+			   this.max = VIRTUAL_NODE;
+			   this.min = VIRTUAL_NODE;
+			   this.size --;
+			   return 0;
+		   }
+
+		   IAVLNode targetNodeParent = targetNode.getParent(); // target node is not a root
+
+		   if (isLeftSon(targetNode)) { // target node is a left son (min need to be checked)
+			   targetNodeParent.setLeft(VIRTUAL_NODE); // bypass target node
+			   if (targetNode == this.min) {
+				   this.min = targetNodeParent; // target node is a leaf and a left son
+			   }
+			   this.size --;
+			   return 0;
+		   }
+
+		   else if (targetNode.getKey() == targetNodeParent.getRight().getKey()) { // target node is a right son (max need to be checked)
+			   targetNodeParent.setRight(VIRTUAL_NODE);
+			   if (targetNode == this.max) {
+				   this.max = targetNodeParent; // target node is a leaf and a right son
+			   }
+			   this.size --;
+			   return 0;
+		   }
+	   }
+
+	   else if (isUnaryRight(targetNode)) { // target node has only right son (min must be checked)
+		   if (isRoot(targetNode)) {
+			   this.root = targetNode.getRight();
+			   this.min = targetNode.getRight(); // target node is a root that has only right sub-tree
+		   }
+
+		   else { // target node is not a root
+			   IAVLNode targetNodeParent = targetNode.getParent();
+			   if (isLeftSon(targetNode)) { // target node is a left son
+				   targetNodeParent.setLeft(targetNode.getRight()); // bypass target node by setting its son as the new left son of his parent
+
+				   if (this.min == targetNode) { // target node is a left son that and has only right son
+					   IAVLNode newMinNode = targetNode.getRight();
+					   while (newMinNode.getLeft() != VIRTUAL_NODE) { // find the minimum in right sub-tree
+						   newMinNode = newMinNode.getLeft();
+					   }
+					   this.min = newMinNode;
+				   }
+			   }
+
+			   else { // target node is a right son (no need to check min or max)
+				   targetNodeParent.setRight(targetNode.getRight()); // bypass target node by setting its son as the new right son of his parent
+			   }
+		   }
+		   this.size --;
+		   return 0;
+	   }
+
+	   else if (isUnaryLeft(targetNode)) { // target node has only left son
+		   if (isRoot(targetNode)) {
+			   this.root = targetNode.getLeft();
+			   this.max = targetNode.getLeft(); // target node is a root that has only left sub-tree
+		   }
+
+
+		   else { // target node is not a root
+			   IAVLNode targetNodeParent = targetNode.getParent();
+			   if (isLeftSon(targetNode)) { // target node is a left son (no need to check min max)
+				   targetNodeParent.setLeft(targetNode.getLeft());
+			   }
+
+			   else { // target node is a right son (max must be checked)
+				   targetNodeParent.setRight(targetNode.getLeft());
+				   if (this.max == targetNode) {
+					   IAVLNode newMaxNode = targetNode.getLeft();
+					   while (newMaxNode.getRight() != VIRTUAL_NODE) {
+						   newMaxNode = newMaxNode.getRight();
+					   }
+					   this.max = newMaxNode;
+				   }
+			   }
+
+		   }
+		   this.size --;
+		   return 0;
+	   }
+
+
+
+
 
 
 
