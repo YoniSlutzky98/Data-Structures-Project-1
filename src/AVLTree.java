@@ -148,20 +148,27 @@ public class AVLTree {
    * Given a child node, rotates the child and its parent.
    * Complexity O(1).
    */
-  private void rotate(IAVLNode c) {
-	  IAVLNode p = c.getParent();
-	  if (p.getRight() == c) {
-		  p.setRight(c.getLeft());
-		  c.setLeft(p);
-		  c.setParent(p.getParent());
-		  p.setParent(c);
+  private void rotate(IAVLNode node) {
+	  IAVLNode p = node.getParent();
+	  if (p.getRight() == node) { // If node is on the right of p
+		  p.setRight(node.getLeft());
+		  p.getRight().setParent(p);
+		  node.setLeft(p);
+	  }
+	  else { // If node is on the left of p
+		  p.setLeft(node.getRight());
+		  p.getLeft().setParent(p);
+		  node.setRight(p);
+	  }
+	  // Fix parent of p and parent of node
+	  if (p.getParent().getLeft() == p) {
+		  p.getParent().setLeft(node);
 	  }
 	  else {
-		  p.setLeft(c.getRight());
-		  c.setRight(p);
-		  c.setParent(p.getParent());
-		  p.setParent(c);
+		  p.getParent().setRight(node);
 	  }
+	  node.setParent(p.getParent());
+	  p.setParent(node);
   }
   
   /*
@@ -540,6 +547,41 @@ public class AVLTree {
 	   return null; 
    }
    
+   /*
+    * Helper function for join().
+    * Re-balances the tree upwards and returns the number of re-balance operations.
+    * Complexity O(|tree.rank - t.rank| + 1)
+    */
+   private int joinRebalance(IAVLNode node) {
+	   IAVLNode p = node.getParent();
+	   if (p == null) { // If node == root, we're done
+		   return 0;
+	   }
+	   if (node.getHeight() != p.getHeight()) { // If we're in balance, we're done
+		   return 0;
+	   }
+	   else {
+		   // Get the sibling of the node
+		   IAVLNode other;
+		   if (p.getLeft() == node) {
+			   other = p.getRight();
+		   }
+		   else {
+			   other = p.getLeft();
+		   }
+		   // If parent is (0,1)/(1,0), or if parent is (0,2)/(2,0) node is (1,2)/(2,1), use insertRebalance()
+		   if (p.getHeight() == other.getHeight() + 1 | 
+				   !(node.getLeft().getHeight() == node.getRight().getHeight())) {
+			   return insertRebalance(node);
+		   }
+		   else { // Otherwise, rotate on the node and promote it, than continue fixing up
+			   rotate(node);
+			   node.setHeight(node.getHeight()+1);
+			   return 2 + joinRebalance(node);
+		   }
+	   }
+   }   
+   
    /**
     * public int join(IAVLNode x, AVLTree t)
     *
@@ -548,10 +590,60 @@ public class AVLTree {
 	*
 	* precondition: keys(t) < x < keys() or keys(t) > x > keys(). t/tree might be empty (rank = -1).
     * postcondition: none
+    * Complexity O(|tree.rank - t.rank| + 1).
     */   
    public int join(IAVLNode x, AVLTree t)
    {
-	   return -1;
+	   // Edge cases:
+	   if (this.empty() & t.empty()) { // This is an extreme edge case, counting "init." of tree with x 
+		   return 1; // Not actually creating a tree - we couldn't ref. it so it's a waste.
+	   }
+	   if (this.empty()) { // Tree is empty - insert x to t.
+		   return t.insert(x.getKey(), x.getValue());
+	   }
+	   if (t.empty()) { // T is empty - insert x to tree.
+		   return this.insert(x.getKey(), x.getValue());
+	   }
+	   
+	   if (this.root.getHeight() < t.root.getHeight()) { // We want tree to have the greater rank.
+		   return t.join(x, this);
+	   }
+	   IAVLNode b = this.getRoot();
+	   IAVLNode a = t.getRoot();
+	   int cnt = 0;
+	   if (b.getKey() > x.getKey()) { // Bigger tree on right, smaller tree on left.
+		   // Get to the first node on the left vertex of tree whose rank isn't greater than the root of t 
+		   while (b.getHeight() > a.getHeight()) { 
+			   b = b.getLeft();
+			   cnt++;
+		   }
+		   // Fix pointer of the tree nodes, and fix height of x
+		   x.setParent(b.getParent());
+		   x.setLeft(a);
+		   a.setParent(x);
+		   b.getParent().setLeft(x);
+		   x.setRight(b);
+		   b.setParent(x);
+		   x.setHeight(a.getHeight()+1);
+	   }
+	   else { // Bigger tree on left, smaller tree on right.
+		   // Get to the first node on the right vertex of tree whose rank isn't greater than the root of t 
+		   while (b.getHeight() > a.getHeight()) { 
+			   b = b.getRight();
+			   cnt++;
+		   }
+		   // Fix pointer of the tree nodes, and fix height of x
+		   x.setParent(b.getParent());
+		   x.setRight(a);
+		   a.setParent(x);
+		   b.getParent().setRight(x);
+		   x.setLeft(b);
+		   b.setParent(x);
+		   x.setHeight(a.getHeight()+1);
+	   }
+	   // Re-balance if needed
+	   joinRebalance(x);
+	   return cnt;	   
    }
 
 	/** 
