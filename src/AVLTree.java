@@ -10,14 +10,12 @@
 public class AVLTree {
 	IAVLNode VIRTUAL_NODE = new AVLNode(-1, null, null, null, null); // VE's parents won't be maintained
 	IAVLNode root, min, max;
-	int size;
 	
 	/*
 	 * Constructor for an AVL tree. Complexity O(1).
 	 */
 	public AVLTree() {
 		this.root = this.min = this.max = VIRTUAL_NODE;
-		this.size = 0;
 	}
 	
   /**
@@ -110,8 +108,25 @@ public class AVLTree {
   }
 
   /*
-   * Helper function for insertRebalance() & deleteRebalance().
+   * Helper function for insert(), delete(), join() & split.
+   * Given a node, corrects the sizes of it and its parent nodes up to the root.
+   * Complexity O(logn).
+   */
+  private void sizeCorrect(IAVLNode node) {
+	 if (node == null) { // If we already fixed the root, we're done
+		 return;
+	 }
+	 else {
+		 node.setSize(node.getLeft().getSize() + node.getRight().getSize() + 1);
+		 sizeCorrect(node.getParent());
+	 }
+  }
+  
+  
+  /*
+   * Helper function for insertRebalance(), deleteRebalance() & joinRebalance(). 
    * Given a child node, rotates the child and its parent.
+   * The function also handles height changes.
    * Complexity O(1).
    */
   private void rotate(IAVLNode node) {
@@ -135,6 +150,9 @@ public class AVLTree {
 	  }
 	  node.setParent(p.getParent());
 	  p.setParent(node);
+	  // Fix heights of node and of parent
+	  p.setHeight(1 + Math.max(p.getLeft().getHeight(), p.getRight().getHeight()));
+	  node.setHeight(1 + Math.max(node.getLeft().getHeight(), p.getRight().getHeight()));
   }
   
   /*
@@ -161,15 +179,13 @@ public class AVLTree {
 					IAVLNode r = node.getRight();
 					// If the node is a (1,2) node
 					if (node.getHeight() == l.getHeight() + 1 && node.getHeight() == r.getHeight() + 2) {
-						p.setHeight(p.getHeight()-1); // Demote parent
-						node.setHeight(node.getHeight()+1); // Promote node
-						rotate(node); // Rotate to the right
+						// Rotate to the right, demote parent, promote node. 
+						rotate(node);
 						return 3; // Problem solved
 					}
 					else { // If the node is a (2,1) node
-						p.setHeight(p.getHeight()-1); // Demote parent
-						node.setHeight(node.getHeight()-1); // Demote node
-						r.setHeight(r.getHeight()+1); // Promte node.right()
+						// Rotate r twice (to the left and to the right), 
+						// demote parent and node, promote r
 						rotate(r); // Rotate to the left
 						rotate(r); // Rotate to the right
 						return 5; // Problem solved
@@ -187,15 +203,13 @@ public class AVLTree {
 					IAVLNode r = node.getRight();
 					// If the node is a (2,1) node
 					if (node.getHeight() == l.getHeight() + 2 && node.getHeight() == r.getHeight() + 1) {
-						p.setHeight(p.getHeight()-1); // Demote parent
-						node.setHeight(node.getHeight()+1); // Promote node
-						rotate(node); // Rotate to the left
+						// Rotate to the left, demote parent, promote node. 
+						rotate(node);
 						return 3; // Problem solved
 					}
 					else { // If the node is a (1,2) node 
-						p.setHeight(p.getHeight()-1); // Demote parent
-						node.setHeight(node.getHeight()-1); // Demote node
-						l.setHeight(l.getHeight()+1); // Promote node.left()
+						// Rotate l twice (to the right and to the left), 
+						// demote parent and node, promote l
 						rotate(l); // Rotate to the right
 						rotate(l); // Rotate to the left
 						return 5; // Problem solved
@@ -217,12 +231,12 @@ public class AVLTree {
    * Returns the number of re-balancing operations, or 0 if no re-balancing operations were necessary.
    * A promotion/rotation counts as one re-balance operation, double-rotation is counted as 2.
    * Returns -1 if an item with key k already exists in the tree.
+   * Handles height and size corrections for the nodes in the tree after the insertion.
    * Complexity O(logn).
    */
    public int insert(int k, String i) {
 	   if (this.root == VIRTUAL_NODE) { // Special case for insertion when tree is empty.
 		   this.root = new AVLNode(k, i, VIRTUAL_NODE, VIRTUAL_NODE, null);
-		   this.size++; // Increase node count
 		   return 0;
 	   }
 	   IAVLNode parent = nodeSearch(k, this.root); // Find where to insert
@@ -231,7 +245,6 @@ public class AVLTree {
 	   }
 	   else {
 		   boolean notLeaf = (parent.getLeft() != VIRTUAL_NODE | parent.getRight() != VIRTUAL_NODE);
-		   this.size++; // Increase node count
 		   IAVLNode child = new AVLNode(k, i, VIRTUAL_NODE, VIRTUAL_NODE, parent); // Create new node
 		   if (parent.getKey() > k) { // Insert on the left side of parent
 			   parent.setLeft(child); 
@@ -250,6 +263,7 @@ public class AVLTree {
 		   }
 		   else { // Otherwise, re-balance it
 			   int rebalances = this.insertRebalance(child);
+			   sizeCorrect(child);
 			   return rebalances;
 		   }
 	   } 	   
@@ -278,7 +292,6 @@ public class AVLTree {
 
 
 
-	   this.size--; // Decrease node count.
 	   return 421;	// to be replaced by student code
    }
 
@@ -338,7 +351,7 @@ public class AVLTree {
 	  if (this.empty()) {
 		  return new int[] {};
 	  }
-	  int[] arr = new int[this.size];
+	  int[] arr = new int[this.root.getSize()];
 	  this.inorderKeys(this.root, arr, 0);
 	  return arr;
   }
@@ -375,7 +388,7 @@ public class AVLTree {
 	  if (this.empty()) {
 		  return new String[] {};
 	  }
-	  String[] arr = new String[this.size];
+	  String[] arr = new String[this.root.getSize()];
 	  this.inorderValues(this.root, arr, 0);
 	  return arr;
   }
@@ -388,7 +401,7 @@ public class AVLTree {
     */
    public int size()
    {
-	   return this.size;
+	   return this.root.getSize();
    }
    
    /**
@@ -448,7 +461,6 @@ public class AVLTree {
 		   }
 		   else { // Otherwise, rotate on the node and promote it, than continue fixing up
 			   rotate(node);
-			   node.setHeight(node.getHeight()+1);
 			   return 2 + joinRebalance(node);
 		   }
 	   }
@@ -534,6 +546,8 @@ public class AVLTree {
 		public boolean isRealNode(); // Returns True if this is a non-virtual AVL node.
     	public void setHeight(int height); // Sets the height of the node.
     	public int getHeight(); // Returns the height of the node (-1 for virtual nodes).
+    	public void setSize(int size); // Sets the size of the sub-tree rooted by the node.
+    	public int getSize(); // Returns the size of the sub-tree rooted by the node.
 	}
 
    /** 
@@ -545,14 +559,18 @@ public class AVLTree {
     * This class can and MUST be modified (It must implement IAVLNode).
     */
   public class AVLNode implements IAVLNode{
-		int key, height; // Each node holds a key, a value, its height, its sons and its parent
+	  	// Each node holds a key, a value, its height, its size, its sons and its parent
+	  	// height(node) = max(height(left), height(right)) + 1
+	  	// size(node) = 1 + size(left) + size(right)
+	  	int key, height, size;  
 		String value;
 		IAVLNode left, right, parent;
 		
 		
 		/*
 		 * A constructor for an AVLNode. O(1) complexity.
-		 * Special case - the node is a virtual one (hence its l and r sons are null)
+		 * Special case - the node is virtual (hence its size is 0, its height is -1 and
+		 * its l and r sons are null)
 		 */
 		public AVLNode(int k, String v, IAVLNode l, IAVLNode r, IAVLNode p) {
 			this.left = l;
@@ -561,9 +579,11 @@ public class AVLTree {
 			if (l == null & r == null) {
 				this.height = -1;
 				this.key = -1;
+				this.size = 0;
 			}
 			else {
 				this.height = Math.max(l.getHeight(), r.getHeight()) + 1;
+				this.size = 1 + l.getSize() + r.getSize();
 				this.key = k;
 				this.value = v;
 			}
@@ -656,6 +676,20 @@ public class AVLTree {
 	    {
 	      return this.height;
 	    }
+		
+		/*
+		 * Sets the size of the sub-tree rooted by an AVLNode. O(1) complexity.
+		 */
+		public void setSize(int size) {
+			this.size = size;
+		}
+		
+		/*
+		 * Returns the size of the sub-tree rooted by an AVLNode. O(1) complexity.
+		 */
+		public int getSize() {
+			return this.size;
+		}
   }
 
 }
