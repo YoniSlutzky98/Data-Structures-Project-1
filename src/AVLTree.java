@@ -114,20 +114,27 @@ public class AVLTree {
    * Given a child node, rotates the child and its parent.
    * Complexity O(1).
    */
-  private void rotate(IAVLNode c) {
-	  IAVLNode p = c.getParent();
-	  if (p.getRight() == c) {
-		  p.setRight(c.getLeft());
-		  c.setLeft(p);
-		  c.setParent(p.getParent());
-		  p.setParent(c);
+  private void rotate(IAVLNode node) {
+	  IAVLNode p = node.getParent();
+	  if (p.getRight() == node) { // If node is on the right of p
+		  p.setRight(node.getLeft());
+		  p.getRight().setParent(p);
+		  node.setLeft(p);
+	  }
+	  else { // If node is on the left of p
+		  p.setLeft(node.getRight());
+		  p.getLeft().setParent(p);
+		  node.setRight(p);
+	  }
+	  // Fix parent of p and parent of node
+	  if (p.getParent().getLeft() == p) {
+		  p.getParent().setLeft(node);
 	  }
 	  else {
-		  p.setLeft(c.getRight());
-		  c.setRight(p);
-		  c.setParent(p.getParent());
-		  p.setParent(c);
+		  p.getParent().setRight(node);
 	  }
+	  node.setParent(p.getParent());
+	  p.setParent(node);
   }
   
   /*
