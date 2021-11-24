@@ -109,17 +109,11 @@ public class AVLTree {
 
   /*
    * Helper function for insert(), delete(), join() & split.
-   * Given a node, corrects the sizes of it and its parent nodes up to the root.
-   * Complexity O(logn).
+   * Given a node, corrects its size.
+   * Complexity O(1).
    */
   private void sizeCorrect(IAVLNode node) {
-	 if (node == null) { // If we already fixed the root, we're done
-		 return;
-	 }
-	 else {
-		 node.setSize(node.getLeft().getSize() + node.getRight().getSize() + 1);
-		 sizeCorrect(node.getParent());
-	 }
+	  node.setSize(node.getLeft().getSize() + node.getRight().getSize() + 1);
   }
   
   
@@ -131,17 +125,17 @@ public class AVLTree {
    */
   private void rotate(IAVLNode node) {
 	  IAVLNode p = node.getParent();
-	  if (p.getRight() == node) { // If node is on the right of p
+	  if (p.getRight() == node) { // If node is on the right of p.
 		  p.setRight(node.getLeft());
 		  p.getRight().setParent(p);
 		  node.setLeft(p);
 	  }
-	  else { // If node is on the left of p
+	  else { // If node is on the left of p.
 		  p.setLeft(node.getRight());
 		  p.getLeft().setParent(p);
 		  node.setRight(p);
 	  }
-	  // Fix parent of p and parent of node
+	  // Fix parent of p and parent of node.
 	  if (p.getParent().getLeft() == p) {
 		  p.getParent().setLeft(node);
 	  }
@@ -150,15 +144,19 @@ public class AVLTree {
 	  }
 	  node.setParent(p.getParent());
 	  p.setParent(node);
-	  // Fix heights of node and of parent
+	  // Fix heights of node and of parent.
 	  p.setHeight(1 + Math.max(p.getLeft().getHeight(), p.getRight().getHeight()));
 	  node.setHeight(1 + Math.max(node.getLeft().getHeight(), p.getRight().getHeight()));
+	  // Fix sizes of node and of parent.
+	  this.sizeCorrect(p);
+	  this.sizeCorrect(node);
   }
   
   /*
    * Helper function for insert().
    * Given inserted node, re-balance the tree up-to the root.
    * Return # of re-balance operations made.
+   * Handles corrections of heights and sizes of affected nodes.
    * Complexity O(logn). 
    */
   private int insertRebalance(IAVLNode node) {
@@ -171,8 +169,9 @@ public class AVLTree {
 			if (p.getLeft() == node) { // If the inserted node was to the left
 				IAVLNode other = p.getRight();
 				if (p.getHeight() == other.getHeight() + 1) { // If the other node has a diff. of 1
-					p.setHeight(p.getHeight() + 1); // Promote parent and re-balance upwards
-					return 1 + insertRebalance(p);
+					p.setHeight(p.getHeight() + 1); // Promote parent and re-balance upwards.
+					this.sizeCorrect(p); // Correct size of parent.
+					return 1 + this.insertRebalance(p);
 				}
 				else {
 					IAVLNode l = node.getLeft();
@@ -180,15 +179,15 @@ public class AVLTree {
 					// If the node is a (1,2) node
 					if (node.getHeight() == l.getHeight() + 1 && node.getHeight() == r.getHeight() + 2) {
 						// Rotate to the right, demote parent, promote node. 
-						rotate(node);
-						return 3; // Problem solved
+						this.rotate(node);
+						return 3 + this.insertRebalance(node); // Problem solved, climbing up to fix sizes.
 					}
 					else { // If the node is a (2,1) node
 						// Rotate r twice (to the left and to the right), 
-						// demote parent and node, promote r
-						rotate(r); // Rotate to the left
-						rotate(r); // Rotate to the right
-						return 5; // Problem solved
+						// demote parent and node, promote r.
+						this.rotate(r); // Rotate to the left.
+						this.rotate(r); // Rotate to the right.
+						return 5 + this.insertRebalance(r); // Problem solved, climbing up to fix sizes.
 					}
 				}
 			}
@@ -196,7 +195,8 @@ public class AVLTree {
 				IAVLNode other = p.getLeft();
 				if (p.getHeight() == other.getHeight() + 1) { // If the other node has a diff. of 1
 					p.setHeight(p.getHeight() + 1); // Promote parent and re-balance upwards
-					return 1 + insertRebalance(p);  
+					this.sizeCorrect(p); // Correct size of parent.
+					return 1 + this.insertRebalance(p);
 				}
 				else {
 					IAVLNode l = node.getLeft();
@@ -204,21 +204,22 @@ public class AVLTree {
 					// If the node is a (2,1) node
 					if (node.getHeight() == l.getHeight() + 2 && node.getHeight() == r.getHeight() + 1) {
 						// Rotate to the left, demote parent, promote node. 
-						rotate(node);
-						return 3; // Problem solved
+						this.rotate(node);
+						return 3 + this.insertRebalance(node); // Problem solved, climbing up to fix sizes.
 					}
 					else { // If the node is a (1,2) node 
 						// Rotate l twice (to the right and to the left), 
-						// demote parent and node, promote l
-						rotate(l); // Rotate to the right
-						rotate(l); // Rotate to the left
-						return 5; // Problem solved
+						// demote parent and node, promote l.
+						this.rotate(l); // Rotate to the right.
+						this.rotate(l); // Rotate to the left.
+						return 5 + this.insertRebalance(l); // Problem solved, climbing up to fix sizes.
 					}
 				}
 			}
 		}
 		else { // If there's no problem
-			return 0;
+			this.sizeCorrect(p); // Correct size of parent.
+			return 0 + this.insertRebalance(p); // No problem, climing up to fix sizes.
 		}
 	}
  }
@@ -263,7 +264,6 @@ public class AVLTree {
 		   }
 		   else { // Otherwise, re-balance it
 			   int rebalances = this.insertRebalance(child);
-			   sizeCorrect(child);
 			   return rebalances;
 		   }
 	   } 	   
@@ -328,12 +328,12 @@ public class AVLTree {
     */
    private int inorderKeys(IAVLNode node, int[] arr, int pointer){
 	   if (node.getLeft() != VIRTUAL_NODE) {
-		   pointer = inorderKeys(node.getLeft(), arr, pointer);
+		   pointer = this.inorderKeys(node.getLeft(), arr, pointer);
 	   }
 	   arr[pointer] = node.getKey();
 	   pointer++;
 	   if (node.getRight() != VIRTUAL_NODE) {
-		   pointer = inorderKeys(node.getRight(), arr, pointer);
+		   pointer = this.inorderKeys(node.getRight(), arr, pointer);
 	   }
 	   return pointer;
    }
@@ -365,12 +365,12 @@ public class AVLTree {
    */
   private int inorderValues(IAVLNode node, String[] arr, int pointer){
 	   if (node.getLeft() != VIRTUAL_NODE) {
-		   pointer = inorderValues(node.getLeft(), arr, pointer);
+		   pointer = this.inorderValues(node.getLeft(), arr, pointer);
 	   }
 	   arr[pointer] = node.getValue();
 	   pointer++;
 	   if (node.getRight() != VIRTUAL_NODE) {
-		   pointer = inorderValues(node.getRight(), arr, pointer);
+		   pointer = this.inorderValues(node.getRight(), arr, pointer);
 	   }
 	   return pointer;
   }
@@ -443,7 +443,8 @@ public class AVLTree {
 		   return 0;
 	   }
 	   if (node.getHeight() != p.getHeight()) { // If we're in balance, we're done
-		   return 0;
+		   sizeCorrect(p); // Correct size of parent.
+		   return 0 + insertRebalance(p); // Problem solved, climbing up to fix sizes.
 	   }
 	   else {
 		   // Get the sibling of the node
@@ -525,8 +526,9 @@ public class AVLTree {
 		   b.setParent(x);
 		   x.setHeight(a.getHeight()+1);
 	   }
-	   // Re-balance if needed
-	   joinRebalance(x);
+	   // Correct sizes and re-balance if needed
+	   this.sizeCorrect(x); 
+	   this.joinRebalance(x);
 	   return cnt;	   
    }
 
