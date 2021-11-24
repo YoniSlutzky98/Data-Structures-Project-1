@@ -1,13 +1,17 @@
 class AVLTree:updates
-implement deleteRebalance() - takes parent node, updates size
+remove tree size (replaced by this.root.getSize())
+fix rotate (maintains node size)
+fix insert (maintains node size)
+fix join (maintain size)
+implement deleteRebalance() - takes parent node, updates size, maintains node size
 implement delete() - BST deletion + rebalancing + min/max updates
-implement split()
+implement split() - maintains node size and tree size
 
 class IAVLNode:
-Done
+Implement setSize(), getSize()
 
 class AVLNode:
-Done
+Implement size field, setSize(), getSize()
 
 class Tester:
 Create and run
