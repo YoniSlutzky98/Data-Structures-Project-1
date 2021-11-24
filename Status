@@ -1,4 +1,4 @@
-class AVLTree:updates
+class AVLTree:
 remove tree size (replaced by this.root.getSize())
 fix rotate (maintains node size)
 fix insert (maintains node size)
