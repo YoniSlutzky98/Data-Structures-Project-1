@@ -303,6 +303,90 @@ public class AVLTree {
 	   } 	   
    }
 
+	/**
+	 * @pre: parentNode != null && targetNode != null
+	 Rerturn the height differences between two nodes
+	 */
+   private int nodeDistance(IAVLNode node1, IAVLNode node2) {
+	   return Math.abs(node1.getHeight() - node2.getHeight());
+   }
+
+   /**
+		Cases to rebalance:
+			1. (2,2)
+			2. (3,1) -> (1,1)
+			3. (3,1) -> (2,1)
+			4. (3,1) -> (1,2)
+	*/
+   private int deleteRebalance(IAVLNode rebalanceNode) {
+	   if (rebalanceNode == null) { // got to the root
+		   return 0;
+	   }
+
+	   IAVLNode leftNode = rebalanceNode.getLeft();
+	   IAVLNode rightNode = rebalanceNode.getRight();
+
+	   int leftDiff = nodeDistance(leftNode, rebalanceNode);
+	   int rightDiff = nodeDistance(rightNode, rebalanceNode);
+
+	   if (leftDiff == 2 && rightDiff == 2) { // case 1
+		   this.sizeCorrect(rebalanceNode);
+		   return 1 + deleteRebalance(rebalanceNode.getParent()); // Problem is either fixed or moved up
+	   }
+
+	   else if (leftDiff == 3 && rightDiff == 1) { // the base is (3,1)
+		   IAVLNode rightRightNode = rightNode.getRight();
+		   IAVLNode rightLeftNode = rightNode.getRight();
+
+		   int rightRightDiff = nodeDistance(rightNode, rightRightNode);
+		   int rightLeftDiff = nodeDistance(rightNode, rightLeftNode);
+
+		   if (rightLeftDiff == 1 && rightRightDiff == 1) { // case 2 [(3,1) -> (1,1)] - rotate left, demote rebalanceNode, promote its right son
+			   this.rotate(rightNode);
+			   return 3 + deleteRebalance(rightNode); // Problem solved, climbing up to fix sizes.
+		   }
+		   else if (rightLeftDiff == 2 && rightRightDiff == 1) { // case 3 [(3,1) -> (2,1)]- rotate left, demote z twice
+			   this.rotate(rightNode);
+			   return 3 + deleteRebalance(rightNode); // Problem is either fixed or moved up
+		   }
+		   else { // case 4 [(3,1) -> (1,2)] - double rotation (we trust here that the previous tree was correct)
+			   this.rotate(rightLeftNode);
+			   this.rotate(rightLeftNode);
+			   return 5 + deleteRebalance(rightLeftNode);
+		   }
+	   }
+
+	   else if (leftDiff == 1 && rightDiff == 3) { // now base id (1,3) which is symmetric
+		   IAVLNode leftRightNode = leftNode.getRight();
+		   IAVLNode leftLeftNode = leftNode.getLeft();
+
+		   int leftRightDiff = nodeDistance(leftNode, leftRightNode);
+		   int leftLeftDiff = nodeDistance(leftNode, leftLeftNode);
+
+		   if (leftRightDiff == 1 && leftLeftDiff == 1) { // Symmetric case 2 [(3,1) -> (1,1)] - rotate right, demote rebalanceNode, promote its left son
+			   this.rotate(leftNode);
+			   return 3 + deleteRebalance(leftNode); // Problem solved, climbing up to fix sizes.
+		   }
+
+		   else if (leftRightDiff == 2 && leftLeftDiff == 1) { // case 3 [(3,1) -> (2,1)] - rotate right, demote twice
+			   this.rotate(leftNode);
+			   return 3 + deleteRebalance(leftNode); // Problem is either fixed or moved up
+		   }
+
+		   else { // case 4 [(3,1) -> (1,2)] - double rotation (we trust here that the previous tree was correct)
+			   this.rotate(leftRightNode);
+			   this.rotate(leftRightNode);
+			   return 5 + deleteRebalance(leftRightNode);
+		   }
+	   }
+
+	   else { // No problem, climb up to fix sizes
+		   this.sizeCorrect(rebalanceNode);
+		   return deleteRebalance(rebalanceNode.getParent());
+	   }
+
+   }
+
   /**
    * public int delete(int k)
    *
@@ -331,7 +415,6 @@ public class AVLTree {
 			   this.root = VIRTUAL_NODE;
 			   this.max = VIRTUAL_NODE;
 			   this.min = VIRTUAL_NODE;
-			   this.size --;
 			   return 0;
 		   }
 
@@ -342,7 +425,6 @@ public class AVLTree {
 			   if (targetNode == this.min) {
 				   this.min = targetNodeParent; // target node is a leaf and a left son
 			   }
-			   this.size --;
 			   return 0;
 		   }
 
@@ -351,7 +433,6 @@ public class AVLTree {
 			   if (targetNode == this.max) {
 				   this.max = targetNodeParent; // target node is a leaf and a right son
 			   }
-			   this.size --;
 			   return 0;
 		   }
 	   }
@@ -380,7 +461,6 @@ public class AVLTree {
 				   targetNodeParent.setRight(targetNode.getRight()); // bypass target node by setting its son as the new right son of his parent
 			   }
 		   }
-		   this.size --;
 		   return 0;
 	   }
 
@@ -409,8 +489,27 @@ public class AVLTree {
 			   }
 
 		   }
-		   this.size --;
 		   return 0;
+	   }
+
+	   else { // Complicated case - target node has two sons
+		   IAVLNode successorNode = findSuccessor(targetNode); // find the successor
+		   delete(successorNode.getKey());
+
+		   // Now I want to make the successor to become the target node
+		   successorNode.setRight(targetNode.getRight()); // set the successor right son
+		   successorNode.setRight(targetNode.getLeft()); // set the successor left son left son
+
+		   if (targetNode.getParent() != null) {
+			   IAVLNode parentNode = targetNode.getParent(); // target node is not the root
+			   if (parentNode.getRight() == targetNode) { // set the successor as the parent new son
+				   parentNode.setRight(successorNode);
+			   }
+
+			   else {  // set the successor as the parent's new son
+				   parentNode.setLeft(successorNode);
+			   }
+		   }
 	   }
 
 
@@ -706,15 +805,15 @@ public class AVLTree {
 			this.left = l;
 			this.right = r;
 			this.parent = p;
-			if (l == null & r == null) {
+			if (l == null & r == null) { // TODO: Check with yoni why only one '&'?
 				this.height = -1;
 				this.key = -1;
 				this.size = 0;
 			}
 			else {
-				this.height = Math.max(l.getHeight(), r.getHeight()) + 1;
+				this.height = Math.max(l.getHeight(), r.getHeight()) + 1; // TODO: what if one of r or l is null
 				this.size = 1 + l.getSize() + r.getSize();
-				this.key = k;
+				this.key = k; // TODO: what if k is null
 				this.value = v;
 			}
 		}
