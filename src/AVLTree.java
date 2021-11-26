@@ -158,6 +158,9 @@ public class AVLTree {
    * Complexity O(1).
    */
   private void rotate(IAVLNode node) {
+	  /* TO DO - fix edge case for when p is root (p's parent is null, need to
+	   * update this.root
+	   */
 	  IAVLNode p = node.getParent();
 	  if (p.getRight() == node) { // If node is on the right of p.
 		  p.setRight(node.getLeft());
@@ -170,11 +173,16 @@ public class AVLTree {
 		  node.setRight(p);
 	  }
 	  // Fix parent of p and parent of node.
-	  if (p.getParent().getLeft() == p) {
-		  p.getParent().setLeft(node);
+	  if (!this.isRoot(p)) { // If parent isn't root, fix its parent's son
+		  if (p.getParent().getLeft() == p) {
+			  p.getParent().setLeft(node);
+		  }
+		  else {
+			  p.getParent().setRight(node);
+		  }
 	  }
-	  else {
-		  p.getParent().setRight(node);
+	  else { // Otherwise, set the node to be the root
+		  this.root = node;
 	  }
 	  node.setParent(p.getParent());
 	  p.setParent(node);
@@ -966,8 +974,12 @@ public class AVLTree {
   public static void main(String [] args) {
 	  AVLTree myTree = new AVLTree();
 	  myTree.insert(1, "hello");
-	  myTree.insert(2, "hello");
+	  myTree.insert(4, "hello");
 	  myTree.insert(7, "hello");
+	  myTree.insert(3, "asd");
+	  myTree.insert(0, "asd");
+	  myTree.insert(2, "asd");
+	  myTree.insert(8, "asd");
 	  print_tree(myTree);
 
   }
