@@ -1,4 +1,5 @@
 class AVLTree:
+Fix join() to update min, max
 implement deleteRebalance() - takes parent node, updates size, maintains node size
 implement delete() - BST deletion + rebalancing + min/max updates
 implement split() - maintains node size and tree size
