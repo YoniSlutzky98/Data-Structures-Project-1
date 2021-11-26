@@ -303,12 +303,6 @@ public class AVLTree {
 		   else {
 			   parent.setRight(child);
 		   }
-		   if (this.max.getKey() < child.getKey()) { // Update max
-			   this.max = child;
-		   }
-		   if (this.min.getKey() > child.getKey()) { // Update min
-			   this.min = child;
-		   }
 		   if (notLeaf) { // If parent wasn't a leaf, the tree doesn't need re-balancing 
 			   return 0;
 		   }
