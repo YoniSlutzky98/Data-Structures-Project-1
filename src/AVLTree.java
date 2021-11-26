@@ -9,13 +9,13 @@
 
 public class AVLTree {
 	IAVLNode VIRTUAL_NODE = new AVLNode(-1, null, null, null, null); // VE's parents won't be maintained
-	IAVLNode root, min, max;
+	IAVLNode root;
 	
 	/*
 	 * Constructor for an AVL tree. Complexity O(1).
 	 */
 	public AVLTree() {
-		this.root = this.min = this.max = VIRTUAL_NODE;
+		this.root = VIRTUAL_NODE;
 	}
 	
   /**
@@ -99,7 +99,7 @@ public class AVLTree {
 	 * Complexity O(log n).
 	 */
 	private IAVLNode findSuccessor(IAVLNode node) {
-		if (node == this.max) { // this node is the maximum so it has not successor
+		if (node == this.root.getMax()) { // this node is the maximum so it has not successor
 			return null;
 		}
 		if (node.getRight() != VIRTUAL_NODE) { // if our node has right son, it is not max and his successor is in its right subtree.
@@ -143,11 +143,19 @@ public class AVLTree {
 
   /*
    * Helper function for insert(), delete(), join() & split.
-   * Given a node, corrects its size.
+   * Given a node, corrects its size, min and max fields.
    * Complexity O(1).
    */
-  private void sizeCorrect(IAVLNode node) {
+  private void fieldCorrect(IAVLNode node) {
 	  node.setSize(node.getLeft().getSize() + node.getRight().getSize() + 1);
+	  node.setMin(node);
+	  node.setMax(node);
+	  if (node.getLeft() != VIRTUAL_NODE) {
+		  node.setMin(node.getLeft().getMin());
+	  }
+	  if (node.getRight() != VIRTUAL_NODE) {
+		  node.setMax(node.getRight().getMax());
+	  }
   }
   
   
@@ -190,8 +198,8 @@ public class AVLTree {
 	  p.setHeight(1 + Math.max(p.getLeft().getHeight(), p.getRight().getHeight()));
 	  node.setHeight(1 + Math.max(node.getLeft().getHeight(), p.getRight().getHeight()));
 	  // Fix sizes of node and of parent.
-	  this.sizeCorrect(p);
-	  this.sizeCorrect(node);
+	  this.fieldCorrect(p);
+	  this.fieldCorrect(node);
   }
   
   /*
@@ -212,7 +220,7 @@ public class AVLTree {
 				IAVLNode other = p.getRight();
 				if (p.getHeight() == other.getHeight() + 1) { // If the other node has a diff. of 1
 					p.setHeight(p.getHeight() + 1); // Promote parent and re-balance upwards.
-					this.sizeCorrect(p); // Correct size of parent.
+					this.fieldCorrect(p); // Correct size of parent.
 					return 1 + this.insertRebalance(p);
 				}
 				else {
@@ -237,7 +245,7 @@ public class AVLTree {
 				IAVLNode other = p.getLeft();
 				if (p.getHeight() == other.getHeight() + 1) { // If the other node has a diff. of 1
 					p.setHeight(p.getHeight() + 1); // Promote parent and re-balance upwards
-					this.sizeCorrect(p); // Correct size of parent.
+					this.fieldCorrect(p); // Correct size of parent.
 					return 1 + this.insertRebalance(p);
 				}
 				else {
@@ -260,7 +268,7 @@ public class AVLTree {
 			}
 		}
 		else { // If there's no problem
-			this.sizeCorrect(p); // Correct size of parent.
+			this.fieldCorrect(p); // Correct size of parent.
 			return 0 + this.insertRebalance(p); // No problem, climing up to fix sizes.
 		}
 	}
@@ -338,7 +346,7 @@ public class AVLTree {
 	   int rightDiff = nodeDistance(rightNode, rebalanceNode);
 
 	   if (leftDiff == 2 && rightDiff == 2) { // case 1
-		   this.sizeCorrect(rebalanceNode);
+		   this.fieldCorrect(rebalanceNode);
 		   return 1 + deleteRebalance(rebalanceNode.getParent()); // Problem is either fixed or moved up
 	   }
 
@@ -389,7 +397,7 @@ public class AVLTree {
 	   }
 
 	   else { // No problem, climb up to fix sizes
-		   this.sizeCorrect(rebalanceNode);
+		   this.fieldCorrect(rebalanceNode);
 		   return deleteRebalance(rebalanceNode.getParent());
 	   }
 
@@ -539,7 +547,7 @@ public class AVLTree {
     */
    public String min()
    {
-	   return this.min.getValue();
+	   return this.root.getMin().getValue();
    }
 
    /**
@@ -551,7 +559,7 @@ public class AVLTree {
     */
    public String max()
    {
-	   return this.max.getValue();
+	   return this.root.getMax().getValue();
    }
 
    /*
@@ -678,7 +686,7 @@ public class AVLTree {
 		   return 0;
 	   }
 	   if (node.getHeight() != p.getHeight()) { // If we're in balance, we're done
-		   sizeCorrect(p); // Correct size of parent.
+		   fieldCorrect(p); // Correct size of parent.
 		   return 0 + insertRebalance(p); // Problem solved, climbing up to fix sizes.
 	   }
 	   else {
@@ -762,7 +770,7 @@ public class AVLTree {
 		   x.setHeight(a.getHeight()+1);
 	   }
 	   // Correct sizes and re-balance if needed
-	   this.sizeCorrect(x); 
+	   this.fieldCorrect(x); 
 	   this.joinRebalance(x);
 	   return cnt;	   
    }
@@ -772,8 +780,8 @@ public class AVLTree {
 	 * ! Do not delete or modify this - otherwise all tests will fail !
 	 */
 	public interface IAVLNode{	
-		public int getKey(); // Returns node's key (for virtual node return -1).
-		public String getValue(); // Returns node's value [info], for virtual node returns null.
+		public int getKey(); // Returns this's key (for virtual node return -1).
+		public String getValue(); // Returns this's value [info], for virtual node returns null.
 		public void setLeft(IAVLNode node); // Sets left child.
 		public IAVLNode getLeft(); // Returns left child, if there is no left child returns null.
 		public void setRight(IAVLNode node); // Sets right child.
@@ -781,10 +789,14 @@ public class AVLTree {
 		public void setParent(IAVLNode node); // Sets parent.
 		public IAVLNode getParent(); // Returns the parent, if there is no parent return null.
 		public boolean isRealNode(); // Returns True if this is a non-virtual AVL node.
-    	public void setHeight(int height); // Sets the height of the node.
-    	public int getHeight(); // Returns the height of the node (-1 for virtual nodes).
-    	public void setSize(int size); // Sets the size of the sub-tree rooted by the node.
-    	public int getSize(); // Returns the size of the sub-tree rooted by the node.
+    	public void setHeight(int height); // Sets the height of this.
+    	public int getHeight(); // Returns the height of this (-1 for virtual nodes).
+    	public void setSize(int size); // Sets the size of the sub-tree rooted by this.
+    	public int getSize(); // Returns the size of the sub-tree rooted by this.
+    	public void setMin(IAVLNode node); // Sets the minimal node in the sub-tree rooted by this.
+    	public IAVLNode getMin(); // Returns the minimal node in the sub-tree rooted by this.
+    	public void setMax(IAVLNode node); // Sets the maximal node in the sub-tree rooted by this.
+    	public IAVLNode getMax(); // Returns the maximal node in the sub-tree rooted by this.
 	}
 
    /** 
@@ -796,12 +808,14 @@ public class AVLTree {
     * This class can and MUST be modified (It must implement IAVLNode).
     */
   public class AVLNode implements IAVLNode{
-	  	// Each node holds a key, a value, its height, its size, its sons and its parent
-	  	// height(node) = max(height(left), height(right)) + 1
-	  	// size(node) = 1 + size(left) + size(right)
+	  	/* Each node holds a key, a value, its height, its size, its sons and its parent.
+	  	 * height(node) = max(height(left), height(right)) + 1
+		 * size(node) = 1 + size(left) + size(right)
+	  	 * Each node also holds the minimal and maximal nodes of its sub-tree.
+	  	 */
 	  	int key, height, size;  
 		String value;
-		IAVLNode left, right, parent;
+		IAVLNode left, right, parent, min, max;
 		
 		
 		/*
@@ -813,6 +827,7 @@ public class AVLTree {
 			this.left = l;
 			this.right = r;
 			this.parent = p;
+			this.min = this.max = this;
 			if (l == null & r == null) { // TODO: Check with yoni why only one '&'?
 				this.height = -1;
 				this.key = -1;
@@ -927,6 +942,39 @@ public class AVLTree {
 		public int getSize() {
 			return this.size;
 		}
+		
+		/*
+		 * Sets the minimal node of the sub-tree rooted by an AVLNode. O(1) complexity.
+		 * Maintenance is kept by insert(), delete(), join(), split().
+		 */
+		public void setMin(IAVLNode node) {
+			this.min = node;
+		}
+		
+		/*
+		 * Returns the minimal node of the sub-tree rooted by an AVLNode. O(1) complexity.
+		 * Maintenance is kept by insert(), delete(), join(), split().
+		 */
+		public IAVLNode getMin() {
+			return this.min;
+		}
+		
+		/*
+		 * Sets the maximal node of the sub-tree rooted by an AVLNode. O(1) complexity.
+		 * Maintenance is kept by insert(), delete(), join(), split().
+		 */
+		public void setMax(IAVLNode node) {
+			this.max = node;
+		}
+		
+		/*
+		 * Returns the maximal node of the sub-tree rooted by an AVLNode. O(1) complexity.
+		 * Maintenance is kept by insert(), delete(), join(), split().
+		 */
+		public IAVLNode getMax() {
+			return this.max;
+		}
+		
   }
 
 	static void print_mat(String[][] mat) {
