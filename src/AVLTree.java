@@ -490,8 +490,21 @@ public class AVLTree {
 			   // Now I want to make the successor to become the target node
 			   successorNode.setHeight(targetNode.getHeight()); // set successor height to be target node height
 			   successorNode.setSize(targetNode.getSize()); // set successor size to be target node size
-			   successorNode.setMax(targetNode.getMax()); // set successor max to be target node max
+			   successorNode.setMax(targetNode.getMax());
 			   successorNode.setMin(targetNode.getMin()); // set successor min to be target node min
+			   if (targetNode.getRight() == VIRTUAL_NODE) { // set the max of successor as itself
+				   successorNode.setMax(successorNode);
+			   }
+			   else { // set successor max to be target node max
+				   successorNode.setMax(targetNode.getMax());
+			   }
+			   if (targetNode.getLeft() == VIRTUAL_NODE) { // set the min of successor as itself
+				   successorNode.setMin(successorNode);
+			   }
+			   else { // set successor min to be target node min
+				   successorNode.setMin(targetNode.getMin());
+			   }
+
 			   if (targetNode.getRight() != successorNode){ // for case when successor is target node right son
 				   successorNode.setRight(targetNode.getRight()); // set the successor right son
 				   successorNode.getRight().setParent(successorNode);
@@ -499,7 +512,6 @@ public class AVLTree {
 			   else {
 				   successorNode.setRight(VIRTUAL_NODE);
 				   successorNode.setSize(targetNode.getLeft().getSize() + 1);
-				   successorNode.setMax(successorNode);
 			   }
 
 			   if (targetNode.getLeft() != successorNode) { // for cases when successor is target node left son
@@ -509,7 +521,6 @@ public class AVLTree {
 			   else {
 				   successorNode.setLeft(VIRTUAL_NODE);
 				   successorNode.setSize(targetNode.getRight().getSize() + 1);
-				   successorNode.setMin(successorNode);
 			   }
 
 			   if (targetNode.getParent() != null) {
@@ -526,8 +537,9 @@ public class AVLTree {
 				   this.fieldCorrect(parentNode);
 			   }
 
-			   else {
+			   else { // target node is the root
 				   successorNode.setParent(null);
+				   this.root = successorNode;
 			   }
 
 			   return rebalancingValue;
@@ -998,7 +1010,7 @@ public class AVLTree {
 		}
 		int height = root.getHeight() + 1;
 		int width = 6 * (int) Math.pow(2, height);
-		mat[i][j + width / 2] = Integer.toString(root.getHeight());
+		mat[i][j + width / 2] = Integer.toString(root.getKey());
 		fill_mat(root.getLeft(), mat, i + 2, j);
 		fill_mat(root.getRight(), mat, i + 2, j - 1 + width / 2);
 	}
@@ -1026,20 +1038,11 @@ public class AVLTree {
 	  myTree.insert(0, "asd");
 	  myTree.insert(2, "asd");
 	  myTree.insert(8, "asd");
-	  myTree.delete(7);
+	  myTree.delete(3);
+	  myTree.delete(1);
+	  myTree.insert(9, "ch");
 	  myTree.delete(8);
-	  print_tree(myTree);
-
 	  myTree.delete(4);
-	  System.out.println(myTree.getRoot().getSize());
-	  System.out.println(myTree.getRoot().getLeft().getSize());
-	  System.out.println(myTree.getRoot().getRight().getSize());
-	  System.out.println(myTree.getRoot().getRight().getLeft().getSize());
-	  System.out.println("------------------");
-	  System.out.println(myTree.getRoot().getHeight());
-	  System.out.println(myTree.getRoot().getLeft().getHeight());
-	  System.out.println(myTree.getRoot().getRight().getHeight());
-	  System.out.println(myTree.getRoot().getRight().getLeft().getHeight());
 	  print_tree(myTree);
 
   }
