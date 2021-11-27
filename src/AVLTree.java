@@ -65,6 +65,7 @@ public class AVLTree {
 	  if (targetNodeParent == null) { // node is root
 		  return false;
 	  }
+
 	  return targetNodeParent.getLeft().getKey() == targetNode.getKey(); // return true if the target node is a left son of his parent, false otherwise.
   }
 
@@ -95,18 +96,19 @@ public class AVLTree {
 			return null;
 		}
 		if (node.getRight() != VIRTUAL_NODE) { // if our node has right son, it is not max and his successor is in its right subtree.
-			node = node.getRight();
-			while (node.getLeft() != VIRTUAL_NODE) {
-				node = node.getLeft();
+			IAVLNode newNode = node.getRight();
+			while (newNode.getLeft() != VIRTUAL_NODE) {
+				newNode = newNode.getLeft();
 			}
-			return node;
+			return newNode;
 		}
 
 		else { // has no right children
 			IAVLNode parentNode = node.getParent();
-			while (parentNode != VIRTUAL_NODE && node == parentNode.getRight()) { // go up the tree to find the first parent that our node is it's left son
-				node = parentNode;
-				parentNode = node.getParent();
+			IAVLNode newNode = node.getRight();
+			while (parentNode != VIRTUAL_NODE && newNode == parentNode.getRight()) { // go up the tree to find the first parent that our node is it's left son
+				newNode = parentNode;
+				parentNode = newNode.getParent();
 			}
 			return parentNode;
 		}
@@ -334,7 +336,7 @@ public class AVLTree {
 	   if (leftDiff == 2 && rightDiff == 2) { // case 1
 		   this.fieldCorrect(rebalanceNode);
 		   rebalanceNode.setHeight(rebalanceNode.getHeight() - 1); // Demote rebalance node
-		   return 1 + deleteRebalance(rebalanceNode.getParent()); // Problem is either fixed or moved up
+		   return 1 + this.deleteRebalance(rebalanceNode.getParent()); // Problem is either fixed or moved up
 	   }
 
 	   else if (leftDiff == 3 && rightDiff == 1) { // the base is (3,1)
@@ -346,16 +348,16 @@ public class AVLTree {
 
 		   if (rightLeftDiff == 1 && rightRightDiff == 1) { // case 2 [(3,1) -> (1,1)] - rotate left, demote rebalanceNode, promote its right son
 			   this.rotate(rightNode);
-			   return 3 + deleteRebalance(rightNode); // Problem solved, climbing up to fix sizes.
+			   return 3 + this.deleteRebalance(rightNode); // Problem solved, climbing up to fix sizes.
 		   }
 		   else if (rightLeftDiff == 2 && rightRightDiff == 1) { // case 3 [(3,1) -> (2,1)]- rotate left, demote z twice
 			   this.rotate(rightNode);
-			   return 3 + deleteRebalance(rightNode); // Problem is either fixed or moved up
+			   return 3 + this.deleteRebalance(rightNode); // Problem is either fixed or moved up
 		   }
 		   else { // case 4 [(3,1) -> (1,2)] - double rotation (we trust here that the previous tree was correct)
 			   this.rotate(rightLeftNode);
 			   this.rotate(rightLeftNode);
-			   return 5 + deleteRebalance(rightLeftNode);
+			   return 5 + this.deleteRebalance(rightLeftNode);
 		   }
 	   }
 
@@ -368,24 +370,24 @@ public class AVLTree {
 
 		   if (leftRightDiff == 1 && leftLeftDiff == 1) { // Symmetric case 2 [(3,1) -> (1,1)] - rotate right, demote rebalanceNode, promote its left son
 			   this.rotate(leftNode);
-			   return 3 + deleteRebalance(leftNode); // Problem solved, climbing up to fix sizes.
+			   return 3 + this.deleteRebalance(leftNode); // Problem solved, climbing up to fix sizes.
 		   }
 
 		   else if (leftRightDiff == 2 && leftLeftDiff == 1) { // case 3 [(3,1) -> (2,1)] - rotate right, demote twice
 			   this.rotate(leftNode);
-			   return 3 + deleteRebalance(leftNode); // Problem is either fixed or moved up
+			   return 3 + this.deleteRebalance(leftNode); // Problem is either fixed or moved up
 		   }
 
 		   else { // case 4 [(3,1) -> (1,2)] - double rotation (we trust here that the previous tree was correct)
 			   this.rotate(leftRightNode);
 			   this.rotate(leftRightNode);
-			   return 5 + deleteRebalance(leftRightNode);
+			   return 5 + this.deleteRebalance(leftRightNode);
 		   }
 	   }
 
 	   else { // No problem, climb up to fix sizes
 		   this.fieldCorrect(rebalanceNode);
-		   return deleteRebalance(rebalanceNode.getParent());
+		   return this.deleteRebalance(rebalanceNode.getParent());
 	   }
 
    }
@@ -444,11 +446,13 @@ public class AVLTree {
 			   else { // target node is not a root
 				   IAVLNode targetNodeParent = targetNode.getParent();
 				   if (isLeftSon(targetNode)) { // target node is a left son
-					   targetNodeParent.setLeft(targetNode.getRight()); // bypass target node by setting its son as the new left son of his parent
+					   targetNodeParent.setLeft(targetNode.getRight()); // bypass target node by setting its left son as the new left son of his parent
+					   targetNode.getRight().setParent(targetNodeParent); // set the right node parent of target as the parent of target
 				   }
 
 				   else { // target node is a right son
-					   targetNodeParent.setRight(targetNode.getRight()); // bypass target node by setting its son as the new right son of his parent
+					   targetNodeParent.setRight(targetNode.getRight()); // bypass target node by setting its right son as the new right son of his parent
+					   targetNode.getRight().setParent(targetNodeParent); // set the right node parent of target as the parent of target
 				   }
 
 				   return this.deleteRebalance(targetNodeParent);
@@ -465,11 +469,13 @@ public class AVLTree {
 			   else { // target node is not a root
 				   IAVLNode targetNodeParent = targetNode.getParent();
 				   if (isLeftSon(targetNode)) { // target node is a left son
-					   targetNodeParent.setLeft(targetNode.getLeft());
+					   targetNodeParent.setLeft(targetNode.getLeft()); // bypass target node by setting its left son as the new left son of his parent
+					   targetNode.getLeft().setParent(targetNodeParent); // set the left node parent of target as the parent of target
 				   }
 
 				   else { // target node is a right son
-					   targetNodeParent.setRight(targetNode.getLeft());
+					   targetNodeParent.setRight(targetNode.getLeft()); // bypass target node by setting its left son as the new right son of his parent
+					   targetNode.getLeft().setParent(targetNodeParent); // set the left node parent of target as the parent of target
 				   }
 
 				   return this.deleteRebalance(targetNodeParent);
@@ -479,35 +485,52 @@ public class AVLTree {
 		   else { // Complicated case - target node has two sons
 			   IAVLNode successorNode = findSuccessor(targetNode); // find the successor  (I know for sure that it has one because the node has right son)
 
+;			   int rebalancingValue = delete(successorNode.getKey());
+
 			   // Now I want to make the successor to become the target node
-			   successorNode.setHeight(targetNode.getHeight());
+			   successorNode.setHeight(targetNode.getHeight()); // set successor height to be target node height
+			   successorNode.setSize(targetNode.getSize()); // set successor size to be target node size
+			   successorNode.setMax(targetNode.getMax()); // set successor max to be target node max
+			   successorNode.setMin(targetNode.getMin()); // set successor min to be target node min
 			   if (targetNode.getRight() != successorNode){ // for case when successor is target node right son
 				   successorNode.setRight(targetNode.getRight()); // set the successor right son
+				   successorNode.getRight().setParent(successorNode);
 			   }
 			   else {
 				   successorNode.setRight(VIRTUAL_NODE);
+				   successorNode.setSize(targetNode.getLeft().getSize() + 1);
+				   successorNode.setMax(successorNode);
 			   }
 
 			   if (targetNode.getLeft() != successorNode) { // for cases when successor is target node left son
-				   successorNode.setRight(targetNode.getLeft()); // set the successor left son
+				   successorNode.setLeft(targetNode.getLeft()); // set the successor left son
+				   successorNode.getLeft().setParent(successorNode);
 			   }
 			   else {
 				   successorNode.setLeft(VIRTUAL_NODE);
+				   successorNode.setSize(targetNode.getRight().getSize() + 1);
+				   successorNode.setMin(successorNode);
 			   }
 
 			   if (targetNode.getParent() != null) {
 				   IAVLNode parentNode = targetNode.getParent(); // target node is not the root
+				   successorNode.setParent(parentNode); // Set the target node parent as the successors parent
 				   if (parentNode.getRight() == targetNode) { // set the successor as the parent's new right son
 					   parentNode.setRight(successorNode);
 				   }
 
-				   else {  // set the successor as the parent's new left son
+				   else {  // set the successor is the parent's new left son
 					   parentNode.setLeft(successorNode);
 				   }
+
+				   this.fieldCorrect(parentNode);
 			   }
 
-			   return delete(successorNode.getKey()); // Deletion is last because I want the rebalancing to occur last.
-			   // The rebalancing here is happening when we call the delete function again using the successor.
+			   else {
+				   successorNode.setParent(null);
+			   }
+
+			   return rebalancingValue;
 
 		   }
 	   }
@@ -975,7 +998,7 @@ public class AVLTree {
 		}
 		int height = root.getHeight() + 1;
 		int width = 6 * (int) Math.pow(2, height);
-		mat[i][j + width / 2] = Integer.toString(root.getKey());
+		mat[i][j + width / 2] = Integer.toString(root.getSize());
 		fill_mat(root.getLeft(), mat, i + 2, j);
 		fill_mat(root.getRight(), mat, i + 2, j - 1 + width / 2);
 	}
@@ -1004,8 +1027,13 @@ public class AVLTree {
 	  myTree.insert(2, "asd");
 	  myTree.insert(8, "asd");
 	  myTree.delete(7);
-//	  myTree.delete(8);
-//	  myTree.delete(3);
+	  myTree.delete(8);
+	  print_tree(myTree);
+	  myTree.delete(4);
+	  System.out.println(myTree.getRoot().getSize());
+	  System.out.println(myTree.getRoot().getLeft().getSize());
+	  System.out.println(myTree.getRoot().getRight().getSize());
+	  System.out.println(myTree.getRoot().getRight().getLeft().getSize());
 	  print_tree(myTree);
 
   }
