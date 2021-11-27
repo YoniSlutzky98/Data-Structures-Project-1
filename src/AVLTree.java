@@ -190,7 +190,7 @@ public class AVLTree {
 	  p.setParent(node);
 	  // Fix heights of node and of parent.
 	  p.setHeight(1 + Math.max(p.getLeft().getHeight(), p.getRight().getHeight()));
-	  node.setHeight(1 + Math.max(node.getLeft().getHeight(), p.getRight().getHeight()));
+	  node.setHeight(1 + Math.max(node.getLeft().getHeight(), node.getRight().getHeight()));
 	  // Fix sizes of node and of parent.
 	  this.fieldCorrect(p);
 	  this.fieldCorrect(node);
@@ -998,7 +998,7 @@ public class AVLTree {
 		}
 		int height = root.getHeight() + 1;
 		int width = 6 * (int) Math.pow(2, height);
-		mat[i][j + width / 2] = Integer.toString(root.getSize());
+		mat[i][j + width / 2] = Integer.toString(root.getHeight());
 		fill_mat(root.getLeft(), mat, i + 2, j);
 		fill_mat(root.getRight(), mat, i + 2, j - 1 + width / 2);
 	}
@@ -1029,11 +1029,17 @@ public class AVLTree {
 	  myTree.delete(7);
 	  myTree.delete(8);
 	  print_tree(myTree);
+
 	  myTree.delete(4);
 	  System.out.println(myTree.getRoot().getSize());
 	  System.out.println(myTree.getRoot().getLeft().getSize());
 	  System.out.println(myTree.getRoot().getRight().getSize());
 	  System.out.println(myTree.getRoot().getRight().getLeft().getSize());
+	  System.out.println("------------------");
+	  System.out.println(myTree.getRoot().getHeight());
+	  System.out.println(myTree.getRoot().getLeft().getHeight());
+	  System.out.println(myTree.getRoot().getRight().getHeight());
+	  System.out.println(myTree.getRoot().getRight().getLeft().getHeight());
 	  print_tree(myTree);
 
   }
