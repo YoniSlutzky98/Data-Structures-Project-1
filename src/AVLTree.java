@@ -136,7 +136,7 @@ public class AVLTree {
   }
 
   /*
-   * Helper function for insert(), delete(), join() & split.
+   * Helper function for insert(), delete(), join() & split().
    * Given a node, corrects its size, min and max fields.
    * Complexity O(1).
    */
@@ -160,9 +160,6 @@ public class AVLTree {
    * Complexity O(1).
    */
   private void rotate(IAVLNode node) {
-	  /* TODO - fix edge case for when p is root (p's parent is null, need to
-	   * update this.root
-	   */
 	  IAVLNode p = node.getParent();
 	  if (p.getRight() == node) { // If node is on the right of p.
 		  p.setRight(node.getLeft());
@@ -289,7 +286,6 @@ public class AVLTree {
 		   return -1;
 	   }
 	   else {
-		   boolean notLeaf = (parent.getLeft() != VIRTUAL_NODE | parent.getRight() != VIRTUAL_NODE);
 		   IAVLNode child = new AVLNode(k, i, VIRTUAL_NODE, VIRTUAL_NODE, parent); // Create new node
 		   if (parent.getKey() > k) { // Insert on the left side of parent
 			   parent.setLeft(child); 
@@ -297,19 +293,14 @@ public class AVLTree {
 		   else {
 			   parent.setRight(child);
 		   }
-		   if (notLeaf) { // If parent wasn't a leaf, the tree doesn't need re-balancing 
-			   return 0;
+		   return this.insertRebalance(child); // Re-balance and validate fields of nodes.   
 		   }
-		   else { // Otherwise, re-balance it
-			   int rebalances = this.insertRebalance(child);
-			   return rebalances;
-		   }
-	   } 	   
-   }
+   } 	   
+
 
 	/**
 	 * @pre: parentNode != null && targetNode != null
-	 Rerturn the height differences between two nodes
+	 return the height differences between two nodes
 	 */
    private int nodeDistance(IAVLNode node1, IAVLNode node2) {
 	   return Math.abs(node1.getHeight() - node2.getHeight());
@@ -784,8 +775,39 @@ public class AVLTree {
 	   this.joinRebalance(x);
 	   return cnt;	   
    }
-
-	/** 
+   
+   
+   /*
+    *  Function for the 1st experimental question.
+    *  Inserts a new element into the tree from the maximum of the tree.
+    *  Returns # of search ops. - diff of ranks between max and the common parent + diff of ranks
+    *  between common parent and inserted node.
+    *  @pre - inserted key is not in tree.
+    *  Time complexity is O(logn).
+    */
+   private int insertFromMax(int k, String i) {
+	   IAVLNode parent = this.root.getMax(); // Start from the max.
+	   int maxRank = parent.getHeight(); // Record height of max.
+	   while (parent.getKey() > k) { // Keep climbing until finding a common parent for max and the new node.
+		   if (this.getRoot() == parent) { // Handle edge case when entering a node smaller than the root.
+			   break;
+		   }
+		   parent = parent.getParent();
+	   }
+	   int commonParentRank = parent.getHeight(); // Record height of common parent.
+	   parent = this.nodeSearch(k, parent); // Find insertion point for the new node.
+	   IAVLNode child = new AVLNode(k, i, VIRTUAL_NODE, VIRTUAL_NODE, parent); // Create the node
+	   if (parent.getKey() > k) { // Insert on the left.
+		   parent.setLeft(child);
+	   }
+	   else {
+		   parent.setRight(child); // Insert on the right. 
+	   }
+	   this.insertRebalance(child); // Re-balance the tree and validates fields of nodes.
+	   return 2 * commonParentRank - maxRank; // Return length of the path between max and the new node.
+   }
+   
+   	/** 
 	 * public interface IAVLNode
 	 * ! Do not delete or modify this - otherwise all tests will fail !
 	 */
@@ -1038,10 +1060,20 @@ public class AVLTree {
 	  myTree.insert(0, "asd");
 	  myTree.insert(2, "asd");
 	  myTree.insert(8, "asd");
+	  print_tree(myTree);
+	  System.out.println(3);
 	  myTree.delete(3);
+	  print_tree(myTree);
+	  System.out.println(1);
 	  myTree.delete(1);
+	  print_tree(myTree);
+	  System.out.println(9);
 	  myTree.insert(9, "ch");
+	  print_tree(myTree);
+	  System.out.println(8);
 	  myTree.delete(8);
+	  print_tree(myTree);
+	  System.out.println(4);
 	  myTree.delete(4);
 	  print_tree(myTree);
 
