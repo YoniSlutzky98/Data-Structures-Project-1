@@ -17,6 +17,10 @@ public class AVLTree {
 	public AVLTree() {
 		this.root = VIRTUAL_NODE;
 	}
+
+	public AVLTree(IAVLNode root) { // TODO: show Yoni the new constructor
+		this.root = root;
+	}
 	
   /**
    * public boolean empty()
@@ -673,7 +677,22 @@ public class AVLTree {
     */   
    public AVLTree[] split(int x)
    {
-	   return null; 
+	   AVLTree biggersTree = new AVLTree();
+	   AVLTree smallersTree = new AVLTree();
+	   IAVLNode targetNode = this.nodeSearch(x, this.root);
+	   IAVLNode rightNode = targetNode.getRight();
+	   IAVLNode leftNode = targetNode.getLeft();
+
+	   while (!isRoot(targetNode)) {
+		   if (this.isLeftSon(targetNode)) {
+			   biggersTree.join()
+		   }
+	   }
+
+
+
+
+
    }
    
    /*
