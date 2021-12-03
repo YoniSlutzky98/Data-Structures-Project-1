@@ -837,6 +837,9 @@ public class AVLTree {
     *  Time complexity is O(logn).
     */
    private int insertFromMax(int k, String i) {
+	   if (this.empty()) {
+		   return this.insert(k, i);
+	   }
 	   IAVLNode parent = this.root.getMax(); // Start from the max.
 	   int maxRank = parent.getHeight(); // Record height of max.
 	   while (parent.getKey() > k) { // Keep climbing until finding a common parent for max and the new node.
@@ -1155,6 +1158,28 @@ public class AVLTree {
 	  print_tree(myTree2.split(20)[0]);
 
 
+	  myTree.insertFromMax(1, "hello");
+	  myTree.insertFromMax(4, "hello");
+	  myTree.insertFromMax(7, "hello");
+	  myTree.insertFromMax(10, "hello");
+	  myTree.insertFromMax(14, "hello");
+	  myTree.insertFromMax(70, "hello");
+	  myTree.insertFromMax(0, "hello");
+	  myTree.insertFromMax(2, "hello");
+	  myTree.insertFromMax(3, "hello");
+	  print_tree(myTree);
+	  AVLTree myTree1 = new AVLTree();
+	  myTree1.insertFromMax(1, "hello");
+	  myTree1.insertFromMax(4, "hello");
+	  myTree1.insertFromMax(7, "hello");
+	  myTree1.insertFromMax(10, "hello");
+	  myTree1.insertFromMax(14, "hello");
+	  myTree1.insertFromMax(70, "hello");
+	  myTree1.insertFromMax(0, "hello");
+	  myTree1.insertFromMax(2, "hello");
+	  myTree1.insertFromMax(3, "hello");
+	  print_tree(myTree1);
+  
   }
 
 }
