@@ -681,7 +681,7 @@ public class AVLTree {
 	* precondition: search(x) != null (i.e. you can also assume that the tree is not empty)
     * postcondition: none
     */   
-   public AVLTree[] split(int x) // TODO: Consider that `this` tree is not correct after splitting.
+   public AVLTree[] split(int x)
    {
 	   IAVLNode targetNode = this.nodeSearch(x, this.root);
 	   IAVLNode rightNode = targetNode.getRight();
@@ -1263,8 +1263,20 @@ public class AVLTree {
 	  print_tree(myTree);
 	  System.out.println(" --------------------- ");
 	  System.out.println(" --------------------- ");
+	  AVLTree[] myList= myTree.split(7);
+	  System.out.println(" --------------------- ");
+	  System.out.println(" --------------------- ");
+	  print_tree(myTree);
+	  System.out.println(" --------------------- ");
+	  System.out.println(" --------------------- ");
+	  print_tree(myList[0]);
+	  System.out.println(" --------------------- ");
+	  System.out.println(" --------------------- ");
+	  print_tree(myList[1]);
+	  System.out.println(" --------------------- ");
+	  System.out.println(" --------------------- ");
 
-	  System.out.println(myTree.splitCount(30)[1]);
+//	  System.out.println(myTree.splitCount(30)[1]);
 
 //	  System.out.println(myTree.splitCount(7)[0]);
 ////	  System.out.println(myTree.splitCount(7)[1]);
