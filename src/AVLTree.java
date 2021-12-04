@@ -782,7 +782,7 @@ public class AVLTree {
 	   if (b.getKey() > x.getKey()) { // Bigger tree on right, smaller tree on left.
 		   // Get to the first node on the left vertex of tree whose rank isn't greater than the root of t
 
-		   if (b.getHeight() == a.getHeight()) {
+		   if (this.nodeDistance(a, b) <= 1) {
 			   x.setLeft(a);
 			   x.setRight(b);
 			   a.setParent(x);
@@ -809,7 +809,7 @@ public class AVLTree {
 	   else { // Bigger tree on left, smaller tree on right.
 		   // Get to the first node on the right vertex of tree whose rank isn't greater than the root of t
 
-		   if (b.getHeight() == a.getHeight()) {
+		   if (this.nodeDistance(a, b) <= 1) {
 			   x.setLeft(b);
 			   x.setRight(a);
 			   a.setParent(x);
@@ -1204,7 +1204,7 @@ public class AVLTree {
 	  System.out.println(" --------------------- ");
 
 
-	  print_tree(myTree.split(8)[0]);
+	  print_tree(myTree.split(1)[1]);
 	  System.out.println(" --------------------- ");
 	  System.out.println(" --------------------- ");
 
