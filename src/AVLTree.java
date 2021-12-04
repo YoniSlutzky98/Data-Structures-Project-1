@@ -838,7 +838,13 @@ public class AVLTree {
 			   x.setHeight(b.getHeight() + 1);
 			   fieldCorrect(x);
 			   this.root = x;
-			   return 1;
+			   if (this.nodeDistance(a, b) == 1) {
+				   return 2;
+			   }
+			   else {
+				   return 1;
+			   }
+
 		   }
 
 		   while (b.getHeight() > a.getHeight()) {
@@ -865,7 +871,12 @@ public class AVLTree {
 			   x.setHeight(b.getHeight() + 1);
 			   fieldCorrect(x);
 			   this.root = x;
-			   return 1;
+			   if (this.nodeDistance(a, b) == 1) {
+				   return 2;
+			   }
+			   else {
+				   return 1;
+			   }
 		   }
 
 		   while (b.getHeight() > a.getHeight()) {
