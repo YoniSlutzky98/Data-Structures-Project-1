@@ -773,15 +773,6 @@ public class AVLTree {
 	   int cnt = 0;
 	   if (b.getKey() > x.getKey()) { // Bigger tree on right, smaller tree on left.
 		   // Get to the first node on the left vertex of tree whose rank isn't greater than the root of t
-		   if (this.nodeDistance(this.root, t.getRoot()) <= 1) {
-				this.root = x;
-				this.root.setRight(b);
-				this.root.setLeft(a);
-				b.setParent(this.root);
-				a.setParent(this.root);
-				this.root.setHeight(Math.max(a.getHeight(), b.getHeight()) + 1);
-				fieldCorrect(this.root);
-		   }
 
 		   while (b.getHeight() > a.getHeight()) {
 			   b = b.getLeft();
@@ -798,16 +789,6 @@ public class AVLTree {
 	   }
 	   else { // Bigger tree on left, smaller tree on right.
 		   // Get to the first node on the right vertex of tree whose rank isn't greater than the root of t
-		   if (this.nodeDistance(this.root, t.getRoot()) <= 1) {
-			   this.root = x;
-			   this.root.setRight(a);
-			   this.root.setLeft(b);
-			   b.setParent(this.root);
-			   a.setParent(this.root);
-			   this.root.setHeight(Math.max(a.getHeight(), b.getHeight()) + 1);
-			   fieldCorrect(this.root);
-		   }
-
 		   while (b.getHeight() > a.getHeight()) {
 			   b = b.getRight();
 			   cnt++;
@@ -1103,6 +1084,62 @@ public class AVLTree {
 	}
 
   public static void main(String [] args) {
+//	  AVLTree myTree = new AVLTree();
+//	  myTree.insert(1, "hello");
+//	  myTree.insert(4, "hello");
+//	  myTree.insert(7, "hello");
+//	  myTree.insert(3, "asd");
+//	  myTree.insert(0, "asd");
+//	  myTree.insert(2, "asd");
+//	  myTree.insert(8, "asd");
+//
+//	  AVLTree myTree2 = new AVLTree();
+//	  myTree2.insert(10, "hello");
+//	  myTree2.insert(40, "hello");
+//	  myTree2.insert(70, "hello");
+//	  myTree2.insert(30, "asd");
+//	  myTree2.insert(50, "asd");
+//	  myTree2.insert(20, "asd");
+//	  myTree2.insert(80, "asd");
+//	  myTree2.insert(100, "hello");
+//	  myTree2.insert(400, "hello");
+//	  myTree2.insert(700, "hello");
+//	  myTree2.insert(300, "asd");
+//	  myTree2.insert(500, "asd");
+//	  myTree2.insert(200, "asd");
+//	  myTree2.insert(800, "asd");
+//
+//
+//
+//	  print_tree(myTree);
+//	  System.out.println(" --------------------- ");
+//	  System.out.println(" --------------------- ");
+//	  print_tree(myTree2);
+//	  System.out.println(" --------------------- ");
+//	  System.out.println(" --------------------- ");
+//
+//	  AVLTree.IAVLNode node = myTree.new AVLNode(9, "check", myTree.VIRTUAL_NODE, myTree.VIRTUAL_NODE, null);
+//
+//	  myTree.join(node, myTree2);
+//	  System.out.println(" --------------------- ");
+//	  System.out.println(" --------------------- ");
+//
+//	  print_tree(myTree);
+//	  System.out.println(" --------------------- ");
+//	  System.out.println(" --------------------- ");
+//	  print_tree(myTree2);
+//	  System.out.println(" --------------------- ");
+//	  System.out.println(" --------------------- ");
+//
+//
+//
+//	  print_tree(myTree2.split(20)[0]);
+
+
+
+
+
+
 	  AVLTree myTree = new AVLTree();
 	  myTree.insert(1, "hello");
 	  myTree.insert(4, "hello");
@@ -1118,17 +1155,6 @@ public class AVLTree {
 	  myTree2.insert(70, "hello");
 	  myTree2.insert(30, "asd");
 	  myTree2.insert(50, "asd");
-	  myTree2.insert(20, "asd");
-	  myTree2.insert(80, "asd");
-	  myTree2.insert(100, "hello");
-	  myTree2.insert(400, "hello");
-	  myTree2.insert(700, "hello");
-	  myTree2.insert(300, "asd");
-	  myTree2.insert(500, "asd");
-	  myTree2.insert(200, "asd");
-	  myTree2.insert(800, "asd");
-
-
 
 	  print_tree(myTree);
 	  System.out.println(" --------------------- ");
@@ -1136,23 +1162,14 @@ public class AVLTree {
 	  print_tree(myTree2);
 	  System.out.println(" --------------------- ");
 	  System.out.println(" --------------------- ");
-
 	  AVLTree.IAVLNode node = myTree.new AVLNode(9, "check", myTree.VIRTUAL_NODE, myTree.VIRTUAL_NODE, null);
 
 	  myTree.join(node, myTree2);
-	  System.out.println(" --------------------- ");
-	  System.out.println(" --------------------- ");
-
 	  print_tree(myTree);
 	  System.out.println(" --------------------- ");
 	  System.out.println(" --------------------- ");
 	  print_tree(myTree2);
-	  System.out.println(" --------------------- ");
-	  System.out.println(" --------------------- ");
 
-
-
-	  print_tree(myTree2.split(20)[0]);
 
 
   }
