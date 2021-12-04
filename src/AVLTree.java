@@ -681,7 +681,7 @@ public class AVLTree {
 	* precondition: search(x) != null (i.e. you can also assume that the tree is not empty)
     * postcondition: none
     */   
-   public AVLTree[] split(int x)
+   public AVLTree[] split(int x) // TODO: Consider that `this` tree is not correct after splitting.
    {
 	   IAVLNode targetNode = this.nodeSearch(x, this.root);
 	   IAVLNode rightNode = targetNode.getRight();
@@ -712,6 +712,54 @@ public class AVLTree {
 
 	   return new AVLTree[] {smallersTree, biggersTree};
    }
+
+	/** Counts the number of join, returns array - [avg number, max number] */
+	public double[] splitCount(int x)
+	{
+		double maxNumber = 0;
+		double sumNumber = 0;
+		double count = 0;
+		double currNumber;
+		IAVLNode targetNode = this.nodeSearch(x, this.root);
+		IAVLNode rightNode = targetNode.getRight();
+		IAVLNode leftNode = targetNode.getLeft();
+		AVLTree biggersTree = new AVLTree(rightNode);
+		AVLTree smallersTree = new AVLTree(leftNode);
+
+		while (!isRoot(targetNode)) {
+			if (this.isLeftSon(targetNode)) {
+				AVLTree.IAVLNode scratchParentNode = this.new AVLNode(targetNode.getParent().getKey(), targetNode.getParent().getValue(), this.VIRTUAL_NODE, this.VIRTUAL_NODE, null);
+				AVLTree newBiggers = new AVLTree(targetNode.getParent().getRight());
+				currNumber = biggersTree.join(scratchParentNode, newBiggers);
+				sumNumber += currNumber;
+				count ++;
+				if (currNumber > maxNumber) {
+					maxNumber = currNumber;
+				}
+				if (biggersTree.root.getHeight() < newBiggers.root.getHeight()) {
+					biggersTree.root = newBiggers.root;
+				}
+			}
+
+			else {
+				AVLTree.IAVLNode scratchParentNode = this.new AVLNode(targetNode.getParent().getKey(), targetNode.getParent().getValue(), this.VIRTUAL_NODE, this.VIRTUAL_NODE, null);
+				AVLTree newSmallers = new AVLTree(targetNode.getParent().getLeft());
+				currNumber = smallersTree.join(scratchParentNode, newSmallers);
+				sumNumber += currNumber;
+				count ++;
+				if (currNumber > maxNumber) {
+					maxNumber = currNumber;
+				}
+				if (smallersTree.root.getHeight() < newSmallers.root.getHeight()) {
+					smallersTree.root = newSmallers.root;
+				}
+			}
+
+			targetNode = targetNode.getParent();
+		}
+
+		return new double[] {sumNumber / count, maxNumber};
+	}
    
    /*
     * Helper function for join().
@@ -1117,6 +1165,19 @@ public class AVLTree {
 
 	}
 
+	/** Given array with Integers return its exchanges number */
+	static int exnum(int [] array) {
+		int count = 0;
+		for (int i=array.length - 1; i > 0; i--) {
+			for (int j= i-1; j >= 0; j --) {
+				if (array [i] < array[j]) {
+					count ++;
+				}
+			}
+		}
+		return count;
+	}
+
   public static void main(String [] args) {
 //	  AVLTree myTree = new AVLTree();
 //	  myTree.insert(1, "hello");
@@ -1203,10 +1264,17 @@ public class AVLTree {
 	  System.out.println(" --------------------- ");
 	  System.out.println(" --------------------- ");
 
+	  System.out.println(myTree.splitCount(30)[1]);
 
-	  print_tree(myTree.split(1)[1]);
-	  System.out.println(" --------------------- ");
-	  System.out.println(" --------------------- ");
+//	  System.out.println(myTree.splitCount(7)[0]);
+////	  System.out.println(myTree.splitCount(7)[1]);
+//	  print_tree(myTree);
+
+
+//	  print_tree(myTree.split(1)[1]);
+//	  System.out.println(" --------------------- ");
+//	  System.out.println(" --------------------- ");
+
 
 
 
