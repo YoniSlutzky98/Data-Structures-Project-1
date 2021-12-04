@@ -23,6 +23,10 @@ public class AVLTree {
 	public AVLTree(IAVLNode root) { // TODO: show Yoni the new constructor
 		this.root = root;
 	}
+
+	public boolean isVirtual(IAVLNode node) {
+		return node.getHeight() == -1 && node.getKey() == -1;
+	}
 	
   /**
    * public boolean empty()
@@ -31,7 +35,7 @@ public class AVLTree {
    * Complexity O(1).
    */
   public boolean empty() {
-	  return this.root == VIRTUAL_NODE;
+	  return this.isVirtual(this.root);
   }
 
   /**
@@ -42,14 +46,14 @@ public class AVLTree {
    * Complexity O(log n). 
    */
   private IAVLNode nodeSearch(int k, IAVLNode node) {
-	  if (node == VIRTUAL_NODE) { // Edge case for when the tree is empty.
+	  if (this.isVirtual(node)) { // Edge case for when the tree is empty.
 		  return null;
 	  }
 	  if (node.getKey() == k) { // Found k
 		  return node;
 	  }
 	  else if (node.getKey() > k) { // k is lesser than current node
-		  if (node.getLeft() == VIRTUAL_NODE) { // If k doesn't exist in the tree
+		  if (this.isVirtual(node.getLeft())) { // If k doesn't exist in the tree
 			  return node;
 		  }
 		  else {
@@ -57,7 +61,7 @@ public class AVLTree {
 		  }
 	  }
 	  else { // k is greater than current node
-		  if (node.getRight() == VIRTUAL_NODE) { // If k doesn't exist in the tree
+		  if (this.isVirtual(node.getRight())) { // If k doesn't exist in the tree
 			  return node;
 		  }
 		  else {
@@ -76,7 +80,7 @@ public class AVLTree {
   }
 
 	private boolean isLeaf(IAVLNode targetNode) {
-	  		return targetNode.getRight() == VIRTUAL_NODE && targetNode.getLeft() == VIRTUAL_NODE;
+	  		return this.isVirtual(targetNode.getRight()) && this.isVirtual(targetNode.getLeft());
 	}
 
 	private boolean isRoot(IAVLNode targetNode) {
@@ -84,11 +88,11 @@ public class AVLTree {
 	}
 
 	private boolean isUnaryRight(IAVLNode targetNode) {
-	  return targetNode.getRight() != VIRTUAL_NODE && targetNode.getLeft() == VIRTUAL_NODE;
+	  return this.isVirtual(targetNode.getRight()) && this.isVirtual(targetNode.getLeft());
 	}
 
 	private boolean isUnaryLeft(IAVLNode targetNode) {
-		return targetNode.getRight() == VIRTUAL_NODE && targetNode.getLeft() != VIRTUAL_NODE;
+		return this.isVirtual(targetNode.getRight()) && this.isVirtual(targetNode.getLeft());
 	}
 
 
@@ -101,9 +105,9 @@ public class AVLTree {
 		if (node == this.root.getMax()) { // this node is the maximum so it has not successor
 			return null;
 		}
-		if (node.getRight() != VIRTUAL_NODE) { // if our node has right son, it is not max and his successor is in its right subtree.
+		if (!this.isVirtual(node.getRight())) { // if our node has right son, it is not max and his successor is in its right subtree.
 			IAVLNode newNode = node.getRight();
-			while (newNode.getLeft() != VIRTUAL_NODE) {
+			while (!this.isVirtual(newNode.getLeft())) {
 				newNode = newNode.getLeft();
 			}
 			return newNode;
@@ -112,7 +116,7 @@ public class AVLTree {
 		else { // has no right children
 			IAVLNode parentNode = node.getParent();
 			IAVLNode newNode = node.getRight();
-			while (parentNode != VIRTUAL_NODE && newNode == parentNode.getRight()) { // go up the tree to find the first parent that our node is it's left son
+			while (this.isVirtual(parentNode) && newNode == parentNode.getRight()) { // go up the tree to find the first parent that our node is it's left son
 				newNode = parentNode;
 				parentNode = newNode.getParent();
 			}
@@ -150,10 +154,10 @@ public class AVLTree {
 	  node.setSize(node.getLeft().getSize() + node.getRight().getSize() + 1);
 	  node.setMin(node);
 	  node.setMax(node);
-	  if (node.getLeft() != VIRTUAL_NODE) {
+	  if (!this.isVirtual(node.getLeft())) {
 		  node.setMin(node.getLeft().getMin());
 	  }
-	  if (node.getRight() != VIRTUAL_NODE) {
+	  if (!this.isVirtual(node.getRight())) {
 		  node.setMax(node.getRight().getMax());
 	  }
   }
@@ -266,7 +270,7 @@ public class AVLTree {
 		}
 		else { // If there's no problem
 			this.fieldCorrect(p); // Correct size of parent.
-			return 0 + this.insertRebalance(p); // No problem, climing up to fix sizes. //TODO: Why 0 is needed ?
+			return this.insertRebalance(p); // No problem, climing up to fix sizes.
 		}
 	}
  }
@@ -283,7 +287,7 @@ public class AVLTree {
    * Complexity O(logn).
    */
    public int insert(int k, String i) {
-	   if (this.root == VIRTUAL_NODE) { // Special case for insertion when tree is empty.
+	   if (this.isVirtual(this.root)) { // Special case for insertion when tree is empty.
 		   this.root = new AVLNode(k, i, VIRTUAL_NODE, VIRTUAL_NODE, null);
 		   return 0;
 	   }
@@ -402,7 +406,7 @@ public class AVLTree {
    * successor and bypass its original place in the tree (unary node).
    */
    public int delete(int k) {
-	   if (this.root == VIRTUAL_NODE) { // Special case when the tree is empty.
+	   if (this.isVirtual(this.root)) { // Special case when the tree is empty.
 		   return -1;
 	   }
 
@@ -489,13 +493,13 @@ public class AVLTree {
 			   successorNode.setSize(targetNode.getSize()); // set successor size to be target node size
 			   successorNode.setMax(targetNode.getMax());
 			   successorNode.setMin(targetNode.getMin()); // set successor min to be target node min
-			   if (targetNode.getRight() == VIRTUAL_NODE) { // set the max of successor as itself
+			   if (this.isVirtual(targetNode.getRight())) { // set the max of successor as itself
 				   successorNode.setMax(successorNode);
 			   }
 			   else { // set successor max to be target node max
 				   successorNode.setMax(targetNode.getMax());
 			   }
-			   if (targetNode.getLeft() == VIRTUAL_NODE) { // set the min of successor as itself
+			   if (this.isVirtual(targetNode.getLeft())) { // set the min of successor as itself
 				   successorNode.setMin(successorNode);
 			   }
 			   else { // set successor min to be target node min
@@ -577,12 +581,12 @@ public class AVLTree {
     * Complexity O(n) (each node is visited once, constant work in each node).
     */
    private int inorderKeys(IAVLNode node, int[] arr, int pointer){
-	   if (node.getLeft() != VIRTUAL_NODE) {
+	   if (!this.isVirtual(node.getLeft())) {
 		   pointer = this.inorderKeys(node.getLeft(), arr, pointer);
 	   }
 	   arr[pointer] = node.getKey();
 	   pointer++;
-	   if (node.getRight() != VIRTUAL_NODE) {
+	   if (!this.isVirtual(node.getRight())) {
 		   pointer = this.inorderKeys(node.getRight(), arr, pointer);
 	   }
 	   return pointer;
@@ -614,12 +618,12 @@ public class AVLTree {
    * Complexity O(n) (each node is visited once, constant work in each node).
    */
   private int inorderValues(IAVLNode node, String[] arr, int pointer){
-	   if (node.getLeft() != VIRTUAL_NODE) {
+	   if (!this.isVirtual(node.getLeft())) {
 		   pointer = this.inorderValues(node.getLeft(), arr, pointer);
 	   }
 	   arr[pointer] = node.getValue();
 	   pointer++;
-	   if (node.getRight() != VIRTUAL_NODE) {
+	   if (this.isVirtual(node.getRight())) {
 		   pointer = this.inorderValues(node.getRight(), arr, pointer);
 	   }
 	   return pointer;
@@ -721,7 +725,7 @@ public class AVLTree {
 	   }
 	   if (node.getHeight() != p.getHeight()) { // If we're in balance, we're done
 		   fieldCorrect(p); // Correct size of parent.
-		   return 0 + insertRebalance(p); // Problem solved, climbing up to fix sizes.
+		   return insertRebalance(p); // Problem solved, climbing up to fix sizes.
 	   }
 	   else {
 		   // Get the sibling of the node
