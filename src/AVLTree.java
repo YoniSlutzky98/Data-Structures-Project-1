@@ -57,7 +57,7 @@ public class AVLTree {
 		  }
 	  }
 	  else { // k is greater than current node
-		  if (node.getRight() == VIRTUAL_NODE) { // If k doesn't exist in the tree 
+		  if (node.getRight() == VIRTUAL_NODE) { // If k doesn't exist in the tree
 			  return node;
 		  }
 		  else {
@@ -690,11 +690,17 @@ public class AVLTree {
 			   AVLTree.IAVLNode scratchParentNode = this.new AVLNode(targetNode.getParent().getKey(), targetNode.getParent().getValue(), this.VIRTUAL_NODE, this.VIRTUAL_NODE, null);
 			   AVLTree newBiggers = new AVLTree(targetNode.getParent().getRight());
 			   biggersTree.join(scratchParentNode, newBiggers);
+			   if (biggersTree.root.getHeight() < newBiggers.root.getHeight()) {
+				   biggersTree.root = newBiggers.root;
+			   }
 		   }
 		   else {
 			   AVLTree.IAVLNode scratchParentNode = this.new AVLNode(targetNode.getParent().getKey(), targetNode.getParent().getValue(), this.VIRTUAL_NODE, this.VIRTUAL_NODE, null);
 			   AVLTree newSmallers = new AVLTree(targetNode.getParent().getLeft());
 			   smallersTree.join(scratchParentNode, newSmallers);
+			   if (smallersTree.root.getHeight() < newSmallers.root.getHeight()) {
+				   smallersTree.root = newSmallers.root;
+			   }
 		   }
 
 		   targetNode = targetNode.getParent();
@@ -751,21 +757,19 @@ public class AVLTree {
     */   
    public int join(IAVLNode x, AVLTree t)
    {
+	   if (this.root.getHeight() < t.root.getHeight()) { // We want tree to have the greater rank.
+		   return t.join(x, this);
+	   }
+
 	   // Edge cases:
 	   if (this.empty() & t.empty()) { // This is an extreme edge case, counting "init." of tree with x 
 		   return 1; // Not actually creating a tree - we couldn't ref. it so it's a waste.
 	   }
-	   if (this.empty()) { // Tree is empty - insert x to t.
-		   return t.insert(x.getKey(), x.getValue());
-	   }
+//	   if (this.empty()) { // Tree is empty - insert x to t.
+//		   return t.insert(x.getKey(), x.getValue());
+//	   }
 	   if (t.empty()) { // T is empty - insert x to tree.
 		   return this.insert(x.getKey(), x.getValue());
-	   }
-
-
-	   
-	   if (this.root.getHeight() < t.root.getHeight()) { // We want tree to have the greater rank.
-		   return t.join(x, this);
 	   }
 
 	   IAVLNode b = this.getRoot();
@@ -773,6 +777,17 @@ public class AVLTree {
 	   int cnt = 0;
 	   if (b.getKey() > x.getKey()) { // Bigger tree on right, smaller tree on left.
 		   // Get to the first node on the left vertex of tree whose rank isn't greater than the root of t
+
+		   if (b.getHeight() == a.getHeight()) {
+			   x.setLeft(a);
+			   x.setRight(b);
+			   a.setParent(x);
+			   b.setParent(x);
+			   x.setHeight(b.getHeight() + 1);
+			   fieldCorrect(x);
+			   this.root = x;
+			   return 1;
+		   }
 
 		   while (b.getHeight() > a.getHeight()) {
 			   b = b.getLeft();
@@ -789,6 +804,18 @@ public class AVLTree {
 	   }
 	   else { // Bigger tree on left, smaller tree on right.
 		   // Get to the first node on the right vertex of tree whose rank isn't greater than the root of t
+
+		   if (b.getHeight() == a.getHeight()) {
+			   x.setLeft(b);
+			   x.setRight(a);
+			   a.setParent(x);
+			   b.setParent(x);
+			   x.setHeight(b.getHeight() + 1);
+			   fieldCorrect(x);
+			   this.root = x;
+			   return 1;
+		   }
+
 		   while (b.getHeight() > a.getHeight()) {
 			   b = b.getRight();
 			   cnt++;
@@ -1171,31 +1198,36 @@ public class AVLTree {
 	  print_tree(myTree);
 	  System.out.println(" --------------------- ");
 	  System.out.println(" --------------------- ");
-	  print_tree(myTree2);
+
+
+	  print_tree(myTree.split(8)[0]);
+	  System.out.println(" --------------------- ");
+	  System.out.println(" --------------------- ");
 
 
 
-	  myTree.insertFromMax(1, "hello");
-	  myTree.insertFromMax(4, "hello");
-	  myTree.insertFromMax(7, "hello");
-	  myTree.insertFromMax(10, "hello");
-	  myTree.insertFromMax(14, "hello");
-	  myTree.insertFromMax(70, "hello");
-	  myTree.insertFromMax(0, "hello");
-	  myTree.insertFromMax(2, "hello");
-	  myTree.insertFromMax(3, "hello");
-	  print_tree(myTree);
-	  AVLTree myTree1 = new AVLTree();
-	  myTree1.insertFromMax(1, "hello");
-	  myTree1.insertFromMax(4, "hello");
-	  myTree1.insertFromMax(7, "hello");
-	  myTree1.insertFromMax(10, "hello");
-	  myTree1.insertFromMax(14, "hello");
-	  myTree1.insertFromMax(70, "hello");
-	  myTree1.insertFromMax(0, "hello");
-	  myTree1.insertFromMax(2, "hello");
-	  myTree1.insertFromMax(3, "hello");
-	  print_tree(myTree1);
+
+//	  myTree.insertFromMax(1, "hello");
+//	  myTree.insertFromMax(4, "hello");
+//	  myTree.insertFromMax(7, "hello");
+//	  myTree.insertFromMax(10, "hello");
+//	  myTree.insertFromMax(14, "hello");
+//	  myTree.insertFromMax(70, "hello");
+//	  myTree.insertFromMax(0, "hello");
+//	  myTree.insertFromMax(2, "hello");
+//	  myTree.insertFromMax(3, "hello");
+//	  print_tree(myTree);
+//	  AVLTree myTree1 = new AVLTree();
+//	  myTree1.insertFromMax(1, "hello");
+//	  myTree1.insertFromMax(4, "hello");
+//	  myTree1.insertFromMax(7, "hello");
+//	  myTree1.insertFromMax(10, "hello");
+//	  myTree1.insertFromMax(14, "hello");
+//	  myTree1.insertFromMax(70, "hello");
+//	  myTree1.insertFromMax(0, "hello");
+//	  myTree1.insertFromMax(2, "hello");
+//	  myTree1.insertFromMax(3, "hello");
+//	  print_tree(myTree1);
   
   }
 
