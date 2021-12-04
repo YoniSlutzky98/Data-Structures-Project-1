@@ -9,10 +9,8 @@ Done
 
 Experiment:
 Section 1
-write function that counts number of exchanges in array - Guy
 perform first experiment (generate random and reverse order arrays, count exchanges, count costs of insertFromMax)
 Section 2
-write split version that returns mean and max of costs of join - Guy
 perform second experiment (generate random trees, take one random key and the maximal key on the left side, perform splits and record join data)
 Update and fill rest of the questions @ overleaf
 
