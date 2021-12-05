@@ -1028,6 +1028,4 @@ public class AVLTree {
 			return this.max;
 		}
 	}
-	public static void main(String[] args) {
-	}
 }
