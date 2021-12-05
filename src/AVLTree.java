@@ -85,11 +85,11 @@ public class AVLTree {
 		return targetNode.getParent() == null;
 	}
 
-	private boolean isUnaryRight(IAVLNode targetNode) {
+	private boolean isUnaryRight(IAVLNode targetNode) { // Which one needs to exist?
 	  return this.isVirtual(targetNode.getRight()) && this.isVirtual(targetNode.getLeft());
 	}
 
-	private boolean isUnaryLeft(IAVLNode targetNode) {
+	private boolean isUnaryLeft(IAVLNode targetNode) { // Which one needs to exist?
 		return this.isVirtual(targetNode.getRight()) && this.isVirtual(targetNode.getLeft());
 	}
 
@@ -114,6 +114,7 @@ public class AVLTree {
 		else { // has no right children
 			IAVLNode parentNode = node.getParent();
 			IAVLNode newNode = node.getRight();
+			// Should be not isvirtual?
 			while (this.isVirtual(parentNode) && newNode == parentNode.getRight()) { // go up the tree to find the first parent that our node is it's left son
 				newNode = parentNode;
 				parentNode = newNode.getParent();
@@ -836,7 +837,13 @@ public class AVLTree {
 			   x.setHeight(b.getHeight() + 1);
 			   fieldCorrect(x);
 			   this.root = x;
-			   return 1;
+			   if (this.nodeDistance(a, b) == 1) {
+				   return 2;
+			   }
+			   else {
+				   return 1;
+			   }
+
 		   }
 
 		   while (b.getHeight() > a.getHeight()) {
@@ -863,7 +870,12 @@ public class AVLTree {
 			   x.setHeight(b.getHeight() + 1);
 			   fieldCorrect(x);
 			   this.root = x;
-			   return 1;
+			   if (this.nodeDistance(a, b) == 1) {
+				   return 2;
+			   }
+			   else {
+				   return 1;
+			   }
 		   }
 
 		   while (b.getHeight() > a.getHeight()) {
