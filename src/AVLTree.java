@@ -12,281 +12,299 @@ public class AVLTree {
 	IAVLNode root;
 	
 	/*
-	 * Constructor for an AVL tree. Complexity O(1).
+	 * Constructor for an AVLTree. Complexity O(1).
 	 */
 	public AVLTree() {
 		this.root = VIRTUAL_NODE;
 	}
 
-	public AVLTree(IAVLNode root) { // TODO: show Yoni the new constructor
+	/*
+	 * Alternative constructor for an AVLTree receiving an IAVLNode to be used as the root. 
+	 * Complexity O(1).
+	 */
+	public AVLTree(IAVLNode root) { 
 		this.root = root;
 	}
-
-	public boolean isVirtual(IAVLNode node) {
-		return node.getKey() == -1;
-	}
 	
-  /**
-   * public boolean empty()
-   *
-   * Returns true if and only if the tree is empty.
-   * Complexity O(1).
-   */
-  public boolean empty() {
-	  return this.isVirtual(this.root);
-  }
-
-  /**
-   * Helper function for search().
-   * Returns the IAVLNode whose key is k, in the sub-tree whose root is node. 
-   * If such IAVLNode doesn't exist in the sub-tree, returns the last node encountered.
-   * Special case - the tree is empty, for which we'll return null.
-   * Complexity O(log n). 
-   */
-  private IAVLNode nodeSearch(int k, IAVLNode node) {
-	  if (this.isVirtual(node)) { // Edge case for when the tree is empty.
-		  return null;
-	  }
-	  if (node.getKey() == k) { // Found k
-		  return node;
-	  }
-	  else if (node.getKey() > k) { // k is lesser than current node
-		  if (this.isVirtual(node.getLeft())) { // If k doesn't exist in the tree
-			  return node;
-		  }
-		  else {
-			  return nodeSearch(k, node.getLeft()); // Go left
-		  }
-	  }
-	  else { // k is greater than current node
-		  if (this.isVirtual(node.getRight())) { // If k doesn't exist in the tree
-			  return node;
-		  }
-		  else {
-			  return nodeSearch(k, node.getRight()); // Go right
-		  }
-	  }
-  }
-
-  private boolean isLeftSon(IAVLNode targetNode) {
-	  IAVLNode targetNodeParent = targetNode.getParent();
-	  if (targetNodeParent == null) { // node is root
-		  return false;
-	  }
-
-	  return targetNodeParent.getLeft().getKey() == targetNode.getKey(); // return true if the target node is a left son of his parent, false otherwise.
-  }
-
-	private boolean isLeaf(IAVLNode targetNode) {
-	  		return this.isVirtual(targetNode.getRight()) && this.isVirtual(targetNode.getLeft());
+	/**
+	 * public boolean empty()
+	 *
+	 * Returns true if and only if the tree is empty.
+	 * Complexity O(1).
+	 */
+	public boolean empty() {
+	  return !this.root.isRealNode();
 	}
-
-	private boolean isRoot(IAVLNode targetNode) {
-		return targetNode.getParent() == null;
-	}
-
-	private boolean isUnaryRight(IAVLNode targetNode) {
-	  return this.isVirtual(targetNode.getRight()) && !this.isVirtual(targetNode.getLeft());
-	}
-
-	private boolean isUnaryLeft(IAVLNode targetNode) {
-		return !this.isVirtual(targetNode.getRight()) && this.isVirtual(targetNode.getLeft());
-	}
-
 
 	/**
-	 * @ret IAVL Node
-	 * @abst finds the successor of a given IAVL Node
+	 * Helper function for search().
+	 * Returns the IAVLNode whose key is k, in the sub-tree whose root is node. 
+	 * If such IAVLNode doesn't exist in the sub-tree, returns the last node encountered.
+	 * Special case - the tree is empty, for which we'll return null.
+	 * Complexity O(log n). 
+	 */
+	private IAVLNode nodeSearch(int k, IAVLNode node) {
+		if (!node.isRealNode()) { // Edge case for when the tree is empty.
+			return null;
+		}
+		if (node.getKey() == k) { // Found k
+			return node;
+		}
+		else if (node.getKey() > k) { // k is lesser than current node
+			if (!node.getLeft().isRealNode()) { // If k doesn't exist in the tree
+				return node;
+			}
+			else {
+				return nodeSearch(k, node.getLeft()); // Go left
+			}
+		}
+		else { // k is greater than current node
+			if (!node.getRight().isRealNode()) { // If k doesn't exist in the tree
+				return node;
+			}
+			else {
+				return nodeSearch(k, node.getRight()); // Go right
+			}
+		}
+	}
+
+	/*
+	 * Helper function for delete().
+	 * Checks if received node is a left son of its parent.
+	 * Complexity O(1).
+	 */
+	private boolean isLeftSon(IAVLNode node) {
+		IAVLNode parent = node.getParent();
+		if (parent == null) { // node is root
+			return false;
+		}
+		return parent.getLeft().getKey() == node.getKey(); // return true if the target node is a left son of his parent, false otherwise.
+	}
+	
+	/*
+	 * Helper function for delete().
+	 * Checks if received node is a leaf.
+	 * Complexity O(1).
+	 */
+	private boolean isLeaf(IAVLNode node) {
+	  		return !node.getLeft().isRealNode() && !node.getRight().isRealNode();
+	}
+
+	/*
+	 * Helper function for delete().
+	 * Checks if received node is the root of the tree.
+	 * Complexity O(1).
+	 */
+	private boolean isRoot(IAVLNode node) {
+		return node.getParent() == null;
+	}
+	
+	/*
+	 * Helper function for delete().
+	 * Checks if received node is an unary node with a left son.
+	 * Complexity O(1).
+	 */
+	private boolean isUnaryLeft(IAVLNode node) {
+		return node.getLeft().isRealNode() && !node.getRight().isRealNode();
+	}
+	
+	/*
+	 * Helper function for delete().
+	 * Checks if received node is an unary node with a right son.
+	 * Complexity O(1).
+	 */
+	private boolean isUnaryRight(IAVLNode node) {
+		return !node.getLeft().isRealNode() && node.getRight().isRealNode();
+	}
+
+	/*
+	 * Helper function for delete().
+	 * Returns the successor of the received node (if it exists). 
 	 * Complexity O(log n).
 	 */
 	private IAVLNode findSuccessor(IAVLNode node) {
 		if (node == this.root.getMax()) { // this node is the maximum so it has not successor
 			return null;
 		}
-		if (!this.isVirtual(node.getRight())) { // if our node has right son, it is not max and his successor is in its right subtree.
+		if (node.getRight().isRealNode()) { // if a right son exists, the successor is in the right sub-tree
 			IAVLNode newNode = node.getRight();
-			while (!this.isVirtual(newNode.getLeft())) {
+			while (newNode.getLeft().isRealNode()) {
 				newNode = newNode.getLeft();
 			}
 			return newNode;
 		}
-
-		else { // has no right children
-			IAVLNode parentNode = node.getParent();
-			IAVLNode newNode = node.getRight();
-			// Should be not isvirtual?
-			while (this.isVirtual(parentNode) && newNode == parentNode.getRight()) { // go up the tree to find the first parent that our node is it's left son
-				newNode = parentNode;
-				parentNode = newNode.getParent();
+		else { // No right sons, successor is upstream
+			IAVLNode parent = node.getParent();
+			IAVLNode newNode = node;
+			while (newNode == parent.getRight()) { // Go upstream until finding the first ancestor to the right of node
+				newNode = parent;
+				parent = newNode.getParent();
 			}
-			return parentNode;
+			return parent;
 		}
 	}
 
-  
- /**
-   * public String search(int k)
-   *
-   * Returns the info of an item with key k if it exists in the tree.
-   * otherwise, returns null.
-   * Uses the nodeSearch helper function.
-   * Complexity O(log n)
-   */
-  public String search(int k)
-  {
-	if (this.empty()) { // If the tree is empty
-		return null;
+	/*
+	* public String search(int k)
+	*
+	* Returns the info of an item with key k if it exists in the tree.
+	* otherwise, returns null.
+	* Uses the nodeSearch helper function.
+	* Complexity O(log n)
+	*/
+	public String search(int k) {
+		if (this.empty()) { // If the tree is empty
+			return null;
+		}
+		IAVLNode searchedNode = this.nodeSearch(k, this.root);
+		if (searchedNode.getKey() != k) { // To make sure the node exists in the tree 
+			return null;
+		}
+		return searchedNode.getValue();
 	}
-	IAVLNode searchedNode = this.nodeSearch(k, this.root);
-	if (searchedNode.getKey() != k) { // To make sure the node exists in the tree 
-		return null;
-	}
-	return searchedNode.getValue();
-  }
 
-  /*
-   * Helper function for insert(), delete(), join() & split().
-   * Given a node, corrects its size, min and max fields.
-   * Complexity O(1).
-   */
-  private void fieldCorrect(IAVLNode node) {
-	  node.setSize(node.getLeft().getSize() + node.getRight().getSize() + 1);
-	  node.setMin(node);
-	  node.setMax(node);
-	  if (!this.isVirtual(node.getLeft())) {
-		  node.setMin(node.getLeft().getMin());
-	  }
-	  if (!this.isVirtual(node.getRight())) {
-		  node.setMax(node.getRight().getMax());
-	  }
-  }
-  
-  
-  /*
-   * Helper function for insertRebalance(), deleteRebalance() & joinRebalance(). 
-   * Given a child node, rotates the child and its parent.
-   * The function also handles height changes.
-   * Complexity O(1).
-   */
-  private void rotate(IAVLNode node) {
-	  IAVLNode p = node.getParent();
-	  if (p.getRight() == node) { // If node is on the right of p.
-		  p.setRight(node.getLeft());
-		  p.getRight().setParent(p);
-		  node.setLeft(p);
-	  }
-	  else { // If node is on the left of p.
-		  p.setLeft(node.getRight());
-		  p.getLeft().setParent(p);
-		  node.setRight(p);
-	  }
-	  // Fix parent of p and parent of node.
-	  if (!this.isRoot(p)) { // If parent isn't root, fix its parent's son
-		  if (p.getParent().getLeft() == p) {
-			  p.getParent().setLeft(node);
-		  }
-		  else {
-			  p.getParent().setRight(node);
-		  }
-	  }
-	  else { // Otherwise, set the node to be the root
-		  this.root = node;
-	  }
-	  node.setParent(p.getParent());
-	  p.setParent(node);
-	  // Fix heights of node and of parent.
-	  p.setHeight(1 + Math.max(p.getLeft().getHeight(), p.getRight().getHeight()));
-	  node.setHeight(1 + Math.max(node.getLeft().getHeight(), node.getRight().getHeight()));
-	  // Fix sizes of node and of parent.
-	  this.fieldCorrect(p);
-	  this.fieldCorrect(node);
-  }
-  
-  /*
-   * Helper function for insert().
-   * Given inserted node, re-balance the tree up-to the root.
-   * Return # of re-balance operations made.
-   * Handles corrections of heights and sizes of affected nodes.
-   * Complexity O(logn). 
-   */
-  private int insertRebalance(IAVLNode node) {
-	IAVLNode p = node.getParent();
-	if (p == null) { // Got to the root, no more re-balances needed.
-		return 0;
+	/*
+	 * Helper function for insert(), delete(), join() & split().
+	 * Given a node, corrects its size, min and max fields.
+	 * Complexity O(1).
+	 */
+	private void fieldCorrect(IAVLNode node) {
+		node.setSize(node.getLeft().getSize() + node.getRight().getSize() + 1);
+		node.setMin(node);
+		node.setMax(node);
+		if (node.getLeft().isRealNode()) {
+			node.setMin(node.getLeft().getMin());
+		}
+		if (node.getRight().isRealNode()) {
+			node.setMax(node.getRight().getMax());
+		}
 	}
-	else {
-		if (p.getHeight() == node.getHeight()) { // If there exists a problem in the tree 
-			if (p.getLeft() == node) { // If the inserted node was to the left
-				IAVLNode other = p.getRight();
-				if (p.getHeight() == other.getHeight() + 1) { // If the other node has a diff. of 1
-					p.setHeight(p.getHeight() + 1); // Promote parent and re-balance upwards.
-					this.fieldCorrect(p); // Correct size of parent.
-					return 1 + this.insertRebalance(p);
-				}
-				else {
-					IAVLNode l = node.getLeft();
-					IAVLNode r = node.getRight();
-					// If the node is a (1,2) node
-					if (node.getHeight() == l.getHeight() + 1 && node.getHeight() == r.getHeight() + 2) {
-						// Rotate to the right, demote parent, promote node. 
-						this.rotate(node);
-						return 3 + this.insertRebalance(node); // Problem solved, climbing up to fix sizes.
+  
+	/*
+	 * Helper function for insertRebalance(), deleteRebalance() & joinRebalance(). 
+	 * Given a child node, rotates the child and its parent.
+	 * The function also handles height changes.
+	 * Complexity O(1).
+	 */
+	private void rotate(IAVLNode node) {
+		IAVLNode parent = node.getParent();
+		if (parent.getRight() == node) { // If node is on the right of p.
+			parent.setRight(node.getLeft());
+			parent.getRight().setParent(parent);
+			node.setLeft(parent);
+		}
+		else { // If node is on the left of p.
+			parent.setLeft(node.getRight());
+			parent.getLeft().setParent(parent);
+			node.setRight(parent);
+		}
+		// Fix parent of p and parent of node.
+		if (!this.isRoot(parent)) { // If parent isn't root, fix its parent's son
+			if (parent.getParent().getLeft() == parent) {
+				parent.getParent().setLeft(node);
+			}
+			else {
+				parent.getParent().setRight(node);
+			}
+		}
+		else { // Otherwise, set the node to be the root
+			this.root = node;
+		}
+		node.setParent(parent.getParent());
+		parent.setParent(node);
+		// Fix heights of node and of parent.
+		parent.setHeight(1 + Math.max(parent.getLeft().getHeight(), parent.getRight().getHeight()));
+		node.setHeight(1 + Math.max(node.getLeft().getHeight(), node.getRight().getHeight()));
+		// Fix sizes of node and of parent.
+		this.fieldCorrect(parent);
+		this.fieldCorrect(node);
+	}
+  
+	/*
+	 * Helper function for insert().
+	 * Given inserted node, re-balance the tree up-to the root.
+	 * Return # of re-balance operations made.
+	 * Handles corrections of heights and sizes of affected nodes.
+	 * Complexity O(logn). 
+	 */
+	private int insertRebalance(IAVLNode node) {
+		IAVLNode p = node.getParent();
+		if (p == null) { // Got to the root, no more re-balances needed.
+			return 0;
+		}
+		else {
+			if (p.getHeight() == node.getHeight()) { // If there exists a problem in the tree 
+				if (p.getLeft() == node) { // If the inserted node was to the left
+					IAVLNode other = p.getRight();
+					if (p.getHeight() == other.getHeight() + 1) { // If the other node has a diff. of 1
+						p.setHeight(p.getHeight() + 1); // Promote parent and re-balance upwards.
+						this.fieldCorrect(p); // Correct size of parent.
+						return 1 + this.insertRebalance(p);
 					}
-					else { // If the node is a (2,1) node
-						// Rotate r twice (to the left and to the right), 
-						// demote parent and node, promote r.
-						this.rotate(r); // Rotate to the left.
-						this.rotate(r); // Rotate to the right.
-						return 5 + this.insertRebalance(r); // Problem solved, climbing up to fix sizes.
+					else {
+						IAVLNode l = node.getLeft();
+						IAVLNode r = node.getRight();
+						// If the node is a (1,2) node
+						if (node.getHeight() == l.getHeight() + 1 && node.getHeight() == r.getHeight() + 2) {
+							// Rotate to the right, demote parent, promote node. 
+							this.rotate(node);
+							return 3 + this.insertRebalance(node); // Problem solved, climbing up to fix sizes.
+						}
+						else { // If the node is a (2,1) node
+							// Rotate r twice (to the left and to the right), 
+							// demote parent and node, promote r.
+							this.rotate(r); // Rotate to the left.
+							this.rotate(r); // Rotate to the right.
+							return 5 + this.insertRebalance(r); // Problem solved, climbing up to fix sizes.
+						}
+					}
+				}
+				else { // If the inserted node was to the right
+					IAVLNode other = p.getLeft();
+					if (p.getHeight() == other.getHeight() + 1) { // If the other node has a diff. of 1
+						p.setHeight(p.getHeight() + 1); // Promote parent and re-balance upwards
+						this.fieldCorrect(p); // Correct size of parent.
+						return 1 + this.insertRebalance(p);
+					}
+					else {
+						IAVLNode l = node.getLeft();
+						IAVLNode r = node.getRight();
+						// If the node is a (2,1) node
+						if (node.getHeight() == l.getHeight() + 2 && node.getHeight() == r.getHeight() + 1) {
+							// Rotate to the left, demote parent, promote node. 
+							this.rotate(node);
+							return 3 + this.insertRebalance(node); // Problem solved, climbing up to fix sizes.
+						}
+						else { // If the node is a (1,2) node 
+							// Rotate l twice (to the right and to the left), 
+							// demote parent and node, promote l.
+							this.rotate(l); // Rotate to the right.
+							this.rotate(l); // Rotate to the left.
+							return 5 + this.insertRebalance(l); // Problem solved, climbing up to fix sizes.
+						}
 					}
 				}
 			}
-			else { // If the inserted node was to the right
-				IAVLNode other = p.getLeft();
-				if (p.getHeight() == other.getHeight() + 1) { // If the other node has a diff. of 1
-					p.setHeight(p.getHeight() + 1); // Promote parent and re-balance upwards
-					this.fieldCorrect(p); // Correct size of parent.
-					return 1 + this.insertRebalance(p);
-				}
-				else {
-					IAVLNode l = node.getLeft();
-					IAVLNode r = node.getRight();
-					// If the node is a (2,1) node
-					if (node.getHeight() == l.getHeight() + 2 && node.getHeight() == r.getHeight() + 1) {
-						// Rotate to the left, demote parent, promote node. 
-						this.rotate(node);
-						return 3 + this.insertRebalance(node); // Problem solved, climbing up to fix sizes.
-					}
-					else { // If the node is a (1,2) node 
-						// Rotate l twice (to the right and to the left), 
-						// demote parent and node, promote l.
-						this.rotate(l); // Rotate to the right.
-						this.rotate(l); // Rotate to the left.
-						return 5 + this.insertRebalance(l); // Problem solved, climbing up to fix sizes.
-					}
-				}
+			else { // If there's no problem
+				this.fieldCorrect(p); // Correct size of parent.
+				return this.insertRebalance(p); // No problem, climing up to fix sizes.
 			}
 		}
-		else { // If there's no problem
-			this.fieldCorrect(p); // Correct size of parent.
-			return this.insertRebalance(p); // No problem, climing up to fix sizes.
-		}
 	}
- }
   
-  /**
-   * public int insert(int k, String i)
-   *
-   * Inserts an item with key k and info i to the AVL tree.
-   * The tree must remain valid, i.e. keep its invariants.
-   * Returns the number of re-balancing operations, or 0 if no re-balancing operations were necessary.
-   * A promotion/rotation counts as one re-balance operation, double-rotation is counted as 2.
-   * Returns -1 if an item with key k already exists in the tree.
-   * Handles height and size corrections for the nodes in the tree after the insertion.
-   * Complexity O(logn).
-   */
-   public int insert(int k, String i) {
-	   if (this.isVirtual(this.root)) { // Special case for insertion when tree is empty.
+	/**
+	 * public int insert(int k, String i)
+	 *
+	 * Inserts an item with key k and info i to the AVL tree.
+	 * The tree must remain valid, i.e. keep its invariants.
+	 * Returns the number of re-balancing operations, or 0 if no re-balancing operations were necessary.
+	 * A promotion/rotation counts as one re-balance operation, double-rotation is counted as 2.
+	 * Returns -1 if an item with key k already exists in the tree.
+	 * Handles height and size corrections for the nodes in the tree after the insertion.
+	 * Complexity O(logn).
+	 */
+	public int insert(int k, String i) {
+	   if (this.empty()) { // Special case for insertion when tree is empty.
 		   this.root = new AVLNode(k, i, VIRTUAL_NODE, VIRTUAL_NODE, null);
 		   return 0;
 	   }
@@ -306,47 +324,54 @@ public class AVLTree {
 		   }
    } 	   
 
-
-	/**
+	/* 
+	 * Helper function for delete().
 	 * @pre: parentNode != null && targetNode != null
-	 return the height differences between two nodes
+	 * Returns the height differences between two nodes
 	 */
    private int nodeDistance(IAVLNode node1, IAVLNode node2) {
 	   return Math.abs(node1.getHeight() - node2.getHeight());
    }
 
    /**
-		Cases to rebalance:
-			1. (2,2)
-			2. (3,1) -> (1,1)
-			3. (3,1) -> (2,1)
-			4. (3,1) -> (1,2)
-	*/
-   private int deleteRebalance(IAVLNode rebalanceNode) {
-	   if (rebalanceNode == null) { // got to the root
+    * /*
+	 * Helper function for insert().
+	 * Given inserted node, re-balance the tree up-to the root.
+	 * Return # of re-balance operations made.
+	 * Handles corrections of heights and sizes of affected nodes.
+	 * Complexity O(logn). 
+	 *
+	 * Cases to rebalance:
+	 * 1. (2,2)
+	 * 2. (3,1) -> (1,1)
+	 * 3. (3,1) -> (2,1)
+	 * 4. (3,1) -> (1,2)
+	 */
+   private int deleteRebalance(IAVLNode node) {
+	   if (node == null) { // Got to the root
 		   return 0;
 	   }
 
-	   IAVLNode leftNode = rebalanceNode.getLeft();
-	   IAVLNode rightNode = rebalanceNode.getRight();
+	   IAVLNode leftNode = node.getLeft();
+	   IAVLNode rightNode = node.getRight();
 
-	   int leftDiff = nodeDistance(leftNode, rebalanceNode);
-	   int rightDiff = nodeDistance(rightNode, rebalanceNode);
+	   int leftDiff = nodeDistance(leftNode, node);
+	   int rightDiff = nodeDistance(rightNode, node);
 
 	   if (leftDiff == 2 && rightDiff == 2) { // case 1
-		   this.fieldCorrect(rebalanceNode);
-		   rebalanceNode.setHeight(rebalanceNode.getHeight() - 1); // Demote rebalance node
-		   return 1 + this.deleteRebalance(rebalanceNode.getParent()); // Problem is either fixed or moved up
+		   this.fieldCorrect(node);
+		   node.setHeight(node.getHeight() - 1); // Demote node
+		   return 1 + this.deleteRebalance(node.getParent()); // Problem is either fixed or moved up
 	   }
 
-	   else if (leftDiff == 3 && rightDiff == 1) { // the base is (3,1)
+	   else if (leftDiff == 3 && rightDiff == 1) { // The base case is (3,1)
 		   IAVLNode rightRightNode = rightNode.getRight();
 		   IAVLNode rightLeftNode = rightNode.getRight();
 
 		   int rightRightDiff = nodeDistance(rightNode, rightRightNode);
 		   int rightLeftDiff = nodeDistance(rightNode, rightLeftNode);
 
-		   if (rightLeftDiff == 1 && rightRightDiff == 1) { // case 2 [(3,1) -> (1,1)] - rotate left, demote rebalanceNode, promote its right son
+		   if (rightLeftDiff == 1 && rightRightDiff == 1) { // case 2 [(3,1) -> (1,1)] - rotate left, demote node, promote its right son
 			   this.rotate(rightNode);
 			   return 3 + this.deleteRebalance(rightNode); // Problem solved, climbing up to fix sizes.
 		   }
@@ -386,550 +411,417 @@ public class AVLTree {
 	   }
 
 	   else { // No problem, climb up to fix sizes
-		   this.fieldCorrect(rebalanceNode);
-		   return this.deleteRebalance(rebalanceNode.getParent());
+		   this.fieldCorrect(node);
+		   return this.deleteRebalance(node.getParent());
 	   }
 
-   }
-
-  /**
-   * public int delete(int k)
-   *
-   * Deletes an item with key k from the binary tree, if it is there.
-   * The tree must remain valid, i.e. keep its invariants.
-   * Returns the number of re-balancing operations, or 0 if no re-balancing operations were necessary.
-   * A promotion/rotation counts as one re-balance operation, double-rotation is counted as 2.
-   * Returns -1 if an item with key k was not found in the tree.
-   * Deletion 2 easy cases: 1. leaf - simple removal; 2. unary - bypass
-   * Deletion complicated case: "healthy" node - find its successor (it has a right node!), replace the node with its
-   * successor and bypass its original place in the tree (unary node).
-   */
-   public int delete(int k) {
-	   if (this.empty()) { // Special case when the tree is empty.
-		   return -1;
-	   }
-
-	   IAVLNode targetNode = nodeSearch(k, this.root); // find the node to delete
-	   if (targetNode.getKey() != k) { // if key does not exist, return -1
-		   return -1;
-	   }
-
-	   else { // key exists in the tree
-		   if (isLeaf(targetNode)) { // target node is a leaf
-			   if (isRoot(targetNode)) { // We delete the root which is the only node in the tree
-				   this.root = VIRTUAL_NODE;
-				   return 0;
-			   }
-
-			   else { // target node is not a root
-				   IAVLNode targetNodeParent = targetNode.getParent(); // target node is not a root
-
-				   if (isLeftSon(targetNode)) { // target node is a left son
-					   targetNodeParent.setLeft(VIRTUAL_NODE); // bypass target node
-				   }
-
-				   else { // target node is a right son
-					   targetNodeParent.setRight(VIRTUAL_NODE); // bypass target node
-				   }
-
-				   return this.deleteRebalance(targetNodeParent);
-
-			   }
-		   }
-
-		   else if (isUnaryRight(targetNode)) { // target node has only right son
-			   if (isRoot(targetNode)) {
-				   this.root = targetNode.getRight();
-				   return 0;
-			   }
-
-			   else { // target node is not a root
-				   IAVLNode targetNodeParent = targetNode.getParent();
-				   if (isLeftSon(targetNode)) { // target node is a left son
-					   targetNodeParent.setLeft(targetNode.getRight()); // bypass target node by setting its left son as the new left son of his parent
-					   targetNode.getRight().setParent(targetNodeParent); // set the right node parent of target as the parent of target
-				   }
-
-				   else { // target node is a right son
-					   targetNodeParent.setRight(targetNode.getRight()); // bypass target node by setting its right son as the new right son of his parent
-					   targetNode.getRight().setParent(targetNodeParent); // set the right node parent of target as the parent of target
-				   }
-
-				   return this.deleteRebalance(targetNodeParent);
-			   }
-		   }
-
-		   else if (isUnaryLeft(targetNode)) { // target node has only left son
-			   if (isRoot(targetNode)) {
-				   this.root = targetNode.getLeft();
-				   return 0;
-
-			   }
-
-			   else { // target node is not a root
-				   IAVLNode targetNodeParent = targetNode.getParent();
-				   if (isLeftSon(targetNode)) { // target node is a left son
-					   targetNodeParent.setLeft(targetNode.getLeft()); // bypass target node by setting its left son as the new left son of his parent
-					   targetNode.getLeft().setParent(targetNodeParent); // set the left node parent of target as the parent of target
-				   }
-
-				   else { // target node is a right son
-					   targetNodeParent.setRight(targetNode.getLeft()); // bypass target node by setting its left son as the new right son of his parent
-					   targetNode.getLeft().setParent(targetNodeParent); // set the left node parent of target as the parent of target
-				   }
-
-				   return this.deleteRebalance(targetNodeParent);
-			   }
-		   }
-
-		   else { // Complicated case - target node has two sons
-			   IAVLNode successorNode = findSuccessor(targetNode); // find the successor  (I know for sure that it has one because the node has right son)
-
-;			   int rebalancingValue = delete(successorNode.getKey());
-
-			   // Now I want to make the successor to become the target node
-			   successorNode.setHeight(targetNode.getHeight()); // set successor height to be target node height
-			   successorNode.setSize(targetNode.getSize()); // set successor size to be target node size
-			   successorNode.setMax(targetNode.getMax());
-			   successorNode.setMin(targetNode.getMin()); // set successor min to be target node min
-			   if (this.isVirtual(targetNode.getRight())) { // set the max of successor as itself
-				   successorNode.setMax(successorNode);
-			   }
-			   else { // set successor max to be target node max
-				   successorNode.setMax(targetNode.getMax());
-			   }
-			   if (this.isVirtual(targetNode.getLeft())) { // set the min of successor as itself
-				   successorNode.setMin(successorNode);
-			   }
-			   else { // set successor min to be target node min
-				   successorNode.setMin(targetNode.getMin());
-			   }
-
-			   if (targetNode.getRight() != successorNode){ // for case when successor is target node right son
-				   successorNode.setRight(targetNode.getRight()); // set the successor right son
-				   successorNode.getRight().setParent(successorNode);
-			   }
-			   else {
-				   successorNode.setRight(VIRTUAL_NODE);
-				   successorNode.setSize(targetNode.getLeft().getSize() + 1);
-			   }
-
-			   if (targetNode.getLeft() != successorNode) { // for cases when successor is target node left son
-				   successorNode.setLeft(targetNode.getLeft()); // set the successor left son
-				   successorNode.getLeft().setParent(successorNode);
-			   }
-			   else {
-				   successorNode.setLeft(VIRTUAL_NODE);
-				   successorNode.setSize(targetNode.getRight().getSize() + 1);
-			   }
-
-			   if (targetNode.getParent() != null) {
-				   IAVLNode parentNode = targetNode.getParent(); // target node is not the root
-				   successorNode.setParent(parentNode); // Set the target node parent as the successors parent
-				   if (parentNode.getRight() == targetNode) { // set the successor as the parent's new right son
-					   parentNode.setRight(successorNode);
-				   }
-
-				   else {  // set the successor is the parent's new left son
-					   parentNode.setLeft(successorNode);
-				   }
-
-				   this.fieldCorrect(parentNode);
-			   }
-
-			   else { // target node is the root
-				   successorNode.setParent(null);
-				   this.root = successorNode;
-			   }
-
-			   return rebalancingValue;
-
-		   }
-	   }
    }
 
    /**
-    * public String min()
+    * public int delete(int k)
     *
-    * Returns the info of the item with the smallest key in the tree,
-    * or null if the tree is empty.
-    * Complexity O(1).
-    */
-   public String min()
-   {
-	   return this.root.getMin().getValue();
-   }
+    * Deletes an item with key k from the binary tree, if it is there.
+    * The tree must remain valid, i.e. keep its invariants.
+    * Returns the number of re-balancing operations, or 0 if no re-balancing operations were necessary.
+    * A promotion/rotation counts as one re-balance operation, double-rotation is counted as 2.
+   	* Returns -1 if an item with key k was not found in the tree.
+   	* Deletion 2 easy cases: 1. leaf - simple removal; 2. unary - bypass
+   	* Deletion complicated case: "healthy" node - find its successor (it has a right node!), replace the node with its
+   	* successor and bypass its original place in the tree (unary node).
+   	*/
+   	public int delete(int k) {
+   		if (this.empty()) { // Special case when the tree is empty.
+   			return -1;
+   		}
+   		IAVLNode node = nodeSearch(k, this.root); // find the node to delete
+   		if (node.getKey() != k) { // if key does not exist, return -1
+   			return -1;
+   		}
+   		else { // key exists in the tree
+   			if (isLeaf(node)) { // target node is a leaf
+   				if (isRoot(node)) { // We delete the root which is the only node in the tree
+   					this.root = VIRTUAL_NODE;
+   					return 0;
+   				}
+   				else { // target node is not a root
+   					IAVLNode parent = node.getParent(); // target node is not a root
+   					if (isLeftSon(node)) { // target node is a left son
+   						parent.setLeft(VIRTUAL_NODE); // bypass target node
+   					}
+   					else { // target node is a right son
+   						parent.setRight(VIRTUAL_NODE); // bypass target node
+   					}
+   					return this.deleteRebalance(parent);
+   				}
+   			}
+   			else if (isUnaryRight(node)) { // target node has only right son
+   				if (isRoot(node)) {
+   					this.root = node.getRight();
+   					return 0;
+   				}
+   				else { // target node is not a root
+   					IAVLNode parent = node.getParent();
+   					if (isLeftSon(node)) { // target node is a left son
+   						parent.setLeft(node.getRight()); // bypass target node by setting its left son as the new left son of his parent
+   						node.getRight().setParent(parent); // set the right node parent of target as the parent of target
+   					}
+   					else { // target node is a right son
+   						parent.setRight(node.getRight()); // bypass target node by setting its right son as the new right son of his parent
+   						node.getRight().setParent(parent); // set the right node parent of target as the parent of target
+   					}
+   					return this.deleteRebalance(parent);
+   				}
+   			}
+   			else if (isUnaryLeft(node)) { // target node has only left son
+   				if (isRoot(node)) {
+   					this.root = node.getLeft();
+   					return 0;
+   				}
+   				else { // target node is not a root
+   					IAVLNode parent = node.getParent();
+   					if (isLeftSon(node)) { // target node is a left son
+   						parent.setLeft(node.getLeft()); // bypass target node by setting its left son as the new left son of his parent
+   						node.getLeft().setParent(parent); // set the left node parent of target as the parent of target
+   						}
+   					else { // target node is a right son
+   						parent.setRight(node.getLeft()); // bypass target node by setting its left son as the new right son of his parent
+   						node.getLeft().setParent(parent); // set the left node parent of target as the parent of target
+   					}
+   					return this.deleteRebalance(parent);
+   				}
+   			}
+   			else { // Complicated case - target node has two sons
+   				IAVLNode successorNode = findSuccessor(node); // find the successor  (I know for sure that it has one because the node has right son)
+   				int rebalancingValue = delete(successorNode.getKey());
+   				// Now I want to make the successor to become the target node
+   				successorNode.setHeight(node.getHeight()); // set successor height to be target node height
+   				successorNode.setSize(node.getSize()); // set successor size to be target node size
+   				successorNode.setMax(node.getMax());
+   				successorNode.setMin(node.getMin()); // set successor min to be target node min
+   				if (!node.getRight().isRealNode()) { // set the max of successor as itself
+   					successorNode.setMax(successorNode);
+   				}
+   				else { // set successor max to be target node max
+   					successorNode.setMax(node.getMax());
+   				}
+   				if (!node.getLeft().isRealNode()) { // set the min of successor as itself
+   					successorNode.setMin(successorNode);
+   				}
+   				else { // set successor min to be target node min
+   					successorNode.setMin(node.getMin());
+   				}
+   				if (node.getRight() != successorNode){ // for case when successor is target node right son
+   					successorNode.setRight(node.getRight()); // set the successor right son
+   					successorNode.getRight().setParent(successorNode);
+   				}
+   				else {
+   					successorNode.setRight(VIRTUAL_NODE);
+   					successorNode.setSize(node.getLeft().getSize() + 1);
+   				}
+   				if (node.getLeft() != successorNode) { // for cases when successor is target node left son
+   					successorNode.setLeft(node.getLeft()); // set the successor left son
+   					successorNode.getLeft().setParent(successorNode);
+   				}
+   				else {
+   					successorNode.setLeft(VIRTUAL_NODE);
+   					successorNode.setSize(node.getRight().getSize() + 1);
+   				}
+   				if (node.getParent() != null) {
+   					IAVLNode parent = node.getParent(); // target node is not the root
+   					successorNode.setParent(parent); // Set the target node parent as the successors parent
+   					if (parent.getRight() == node) { // set the successor as the parent's new right son
+   						parent.setRight(successorNode);
+   					}
+   					else {  // set the successor is the parent's new left son
+   						parent.setLeft(successorNode);
+   					}
+   					this.fieldCorrect(parent);
+   				}
+   				else { // target node is the root
+   					successorNode.setParent(null);
+   					this.root = successorNode;
+   				}
+   				return rebalancingValue;
+   			}
+   		}
+   	}
 
-   /**
-    * public String max()
-    *
-    * Returns the info of the item with the largest key in the tree,
-    * or null if the tree is empty.
-    * Complexity O(1).
-    */
-   public String max()
-   {
-	   return this.root.getMax().getValue();
-   }
+   	/**
+   	 * public String min()
+   	 *
+   	 * Returns the info of the item with the smallest key in the tree,
+   	 * or null if the tree is empty.
+   	 * Complexity O(1).
+   	 */
+   	public String min()
+   	{
+   		return this.root.getMin().getValue();
+   	}
 
-   /*
-    * Helper function for keysToArray().
-    * Inserts the keys inorder to arr.
-    * Returns the pointer after making the insertions (so we could keep track of where
-    * to insert).
-    * Complexity O(n) (each node is visited once, constant work in each node).
-    */
-   private int inorderKeys(IAVLNode node, int[] arr, int pointer){
-	   if (!this.isVirtual(node.getLeft())) {
+   	/**
+   	 * public String max()
+   	 *
+   	 * Returns the info of the item with the largest key in the tree,
+   	 * or null if the tree is empty.
+   	 * Complexity O(1).
+   	 */
+   	public String max()
+   	{
+   		return this.root.getMax().getValue();
+   	}
+
+   	/*
+   	 * Helper function for keysToArray().
+   	 * Inserts the keys inorder to arr.
+   	 * Returns the pointer after making the insertions (so we could keep track of where
+   	 * to insert).
+   	 * Complexity O(n) (each node is visited once, constant work in each node).
+   	 */
+   	private int inorderKeys(IAVLNode node, int[] arr, int pointer){
+   		if (node.getLeft().isRealNode()) {
 		   pointer = this.inorderKeys(node.getLeft(), arr, pointer);
-	   }
-	   arr[pointer] = node.getKey();
-	   pointer++;
-	   if (!this.isVirtual(node.getRight())) {
-		   pointer = this.inorderKeys(node.getRight(), arr, pointer);
-	   }
-	   return pointer;
-   }
+   		}
+   		arr[pointer] = node.getKey();
+   		pointer++;
+   		if (node.getRight().isRealNode()) {
+   			pointer = this.inorderKeys(node.getRight(), arr, pointer);
+   		}
+   		return pointer;
+   	}
    
-   
-   /**
-   * public int[] keysToArray()
-   *
-   * Returns a sorted array which contains all keys in the tree,
-   * or an empty array if the tree is empty.
-   * Complexity O(n).
-   */
-  public int[] keysToArray()
-  {
-	  if (this.empty()) {
-		  return new int[] {};
-	  }
-	  int[] arr = new int[this.root.getSize()];
-	  this.inorderKeys(this.root, arr, 0);
-	  return arr;
-  }
+   	/**
+   	 * public int[] keysToArray()
+   	 *
+   	 * Returns a sorted array which contains all keys in the tree,
+   	 * or an empty array if the tree is empty.
+   	 * Complexity O(n).
+   	 */
+   	public int[] keysToArray()
+   	{
+   		if (this.empty()) {
+   			return new int[] {};
+   		}
+   		int[] arr = new int[this.root.getSize()];
+   		this.inorderKeys(this.root, arr, 0);
+   		return arr;
+   	}
  
-  /*
-   * Helper function for infoToArray().
-   * Inserts the values inorder to arr.
-   * Returns the pointer after making the insertions (so we could keep track of where
-   * to insert).
-   * Complexity O(n) (each node is visited once, constant work in each node).
-   */
-  private int inorderValues(IAVLNode node, String[] arr, int pointer){
-	   if (!this.isVirtual(node.getLeft())) {
-		   pointer = this.inorderValues(node.getLeft(), arr, pointer);
-	   }
-	   arr[pointer] = node.getValue();
-	   pointer++;
-	   if (!this.isVirtual(node.getRight())) {
-		   pointer = this.inorderValues(node.getRight(), arr, pointer);
-	   }
-	   return pointer;
-  }
+   	/*
+   	 * Helper function for infoToArray().
+   	 * Inserts the values inorder to arr.
+   	 * Returns the pointer after making the insertions (so we could keep track of where
+   	 * to insert).
+   	 * Complexity O(n) (each node is visited once, constant work in each node).
+   	 */
+   	private int inorderValues(IAVLNode node, String[] arr, int pointer){
+   		if (node.getLeft().isRealNode()) {
+   			pointer = this.inorderValues(node.getLeft(), arr, pointer);
+   		}
+   		arr[pointer] = node.getValue();
+   		pointer++;
+   		if (node.getRight().isRealNode()) {
+   			pointer = this.inorderValues(node.getRight(), arr, pointer);
+   		}
+   		return pointer;
+   	}
   
-  /**
-   * public String[] infoToArray()
-   *
-   * Returns an array which contains all info in the tree,
-   * sorted by their respective keys,
-   * or an empty array if the tree is empty.
-   * Complexity O(n).
-   */
-  public String[] infoToArray()
-  {
-	  if (this.empty()) {
-		  return new String[] {};
-	  }
-	  String[] arr = new String[this.root.getSize()];
-	  this.inorderValues(this.root, arr, 0);
-	  return arr;
-  }
+   	/*
+   	 * public String[] infoToArray()
+   	 *
+   	 * Returns an array which contains all info in the tree,
+   	 * sorted by their respective keys,
+   	 * or an empty array if the tree is empty.
+   	 * Complexity O(n).
+   	 */
+   	public String[] infoToArray()
+   	{
+   		if (this.empty()) {
+   			return new String[] {};
+   		}
+   		String[] arr = new String[this.root.getSize()];
+   		this.inorderValues(this.root, arr, 0);
+   		return arr;
+   	}
 
-   /**
-    * public int size()
-    *
-    * Returns the number of nodes in the tree.
-    * Complexity O(1).
-    */
-   public int size()
-   {
-	   return this.root.getSize();
-   }
+   	/*
+   	 * public int size()
+   	 *
+   	 * Returns the number of nodes in the tree.
+   	 * Complexity O(1).
+   	 */
+   	public int size()
+   	{
+   		return this.root.getSize();
+   	}
    
-   /**
-    * public int getRoot()
-    *
-    * Returns the root AVL node, or null if the tree is empty
-    * Complexity O(1).
-    */
-   public IAVLNode getRoot()
-   {
-	   if (this.empty()) {
-		   return null;
-	   }
-	   return this.root;
-   }
+   	/*
+   	 * public int getRoot()
+   	 *
+   	 * Returns the root AVL node, or null if the tree is empty
+   	 * Complexity O(1).
+   	 */
+   	public IAVLNode getRoot()
+   	{
+   		if (this.empty()) {
+   			return null;
+   		}
+   		return this.root;
+   	}
    
-   /**
-    * public AVLTree[] split(int x)
-    *
-    * splits the tree into 2 trees according to the key x. 
-    * Returns an array [t1, t2] with two AVL trees. keys(t1) < x < keys(t2).
-    * 
-	* precondition: search(x) != null (i.e. you can also assume that the tree is not empty)
-    * postcondition: none
-    */   
-   public AVLTree[] split(int x)
-   {
-	   IAVLNode targetNode = this.nodeSearch(x, this.root);
-	   IAVLNode rightNode = targetNode.getRight();
-	   IAVLNode leftNode = targetNode.getLeft();
-	   AVLTree biggersTree = new AVLTree(rightNode);
-	   AVLTree smallersTree = new AVLTree(leftNode);
-
-	   while (!isRoot(targetNode)) {
-		   if (this.isLeftSon(targetNode)) {
-			   AVLTree.IAVLNode scratchParentNode = this.new AVLNode(targetNode.getParent().getKey(), targetNode.getParent().getValue(), this.VIRTUAL_NODE, this.VIRTUAL_NODE, null);
-			   AVLTree newBiggers = new AVLTree(targetNode.getParent().getRight());
-			   biggersTree.join(scratchParentNode, newBiggers);
-			   if (biggersTree.root.getHeight() < newBiggers.root.getHeight()) {
-				   biggersTree.root = newBiggers.root;
-			   }
-		   }
-		   else {
-			   AVLTree.IAVLNode scratchParentNode = this.new AVLNode(targetNode.getParent().getKey(), targetNode.getParent().getValue(), this.VIRTUAL_NODE, this.VIRTUAL_NODE, null);
-			   AVLTree newSmallers = new AVLTree(targetNode.getParent().getLeft());
-			   smallersTree.join(scratchParentNode, newSmallers);
-			   if (smallersTree.root.getHeight() < newSmallers.root.getHeight()) {
-				   smallersTree.root = newSmallers.root;
-			   }
-		   }
-
-		   targetNode = targetNode.getParent();
-	   }
-
-	   return new AVLTree[] {smallersTree, biggersTree};
-   }
-
-	/** Counts the number of join, returns array - [avg number, max number] */
-	public double[] splitCount(int x)
-	{
-		double maxNumber = 0;
-		double sumNumber = 0;
-		double count = 0;
-		double currNumber;
-		IAVLNode targetNode = this.nodeSearch(x, this.root);
-		IAVLNode rightNode = targetNode.getRight();
-		IAVLNode leftNode = targetNode.getLeft();
-		AVLTree biggersTree = new AVLTree(rightNode);
-		AVLTree smallersTree = new AVLTree(leftNode);
-
-		while (!isRoot(targetNode)) {
-			if (this.isLeftSon(targetNode)) {
-				AVLTree.IAVLNode scratchParentNode = this.new AVLNode(targetNode.getParent().getKey(), targetNode.getParent().getValue(), this.VIRTUAL_NODE, this.VIRTUAL_NODE, null);
-				AVLTree newBiggers = new AVLTree(targetNode.getParent().getRight());
-				currNumber = biggersTree.join(scratchParentNode, newBiggers);
-				sumNumber += currNumber;
-				count ++;
-				if (currNumber > maxNumber) {
-					maxNumber = currNumber;
-				}
-				if (biggersTree.root.getHeight() < newBiggers.root.getHeight()) {
-					biggersTree.root = newBiggers.root;
-				}
-			}
-
-			else {
-				AVLTree.IAVLNode scratchParentNode = this.new AVLNode(targetNode.getParent().getKey(), targetNode.getParent().getValue(), this.VIRTUAL_NODE, this.VIRTUAL_NODE, null);
-				AVLTree newSmallers = new AVLTree(targetNode.getParent().getLeft());
-				currNumber = smallersTree.join(scratchParentNode, newSmallers);
-				sumNumber += currNumber;
-				count ++;
-				if (currNumber > maxNumber) {
-					maxNumber = currNumber;
-				}
-				if (smallersTree.root.getHeight() < newSmallers.root.getHeight()) {
-					smallersTree.root = newSmallers.root;
-				}
-			}
-
-			targetNode = targetNode.getParent();
-		}
-
-		return new double[] {sumNumber / count, maxNumber};
-	}
+   	/*
+   	 * public AVLTree[] split(int x)
+   	 *
+   	 * splits the tree into 2 trees according to the key x. 
+   	 * Returns an array [t1, t2] with two AVL trees. keys(t1) < x < keys(t2).
+   	 * 
+   	 * precondition: search(x) != null (i.e. you can also assume that the tree is not empty)
+   	 * postcondition: none
+   	 */   
+   	public AVLTree[] split(int x)
+   	{
+   		IAVLNode node = this.nodeSearch(x, this.root);
+   		IAVLNode rightNode = node.getRight();
+   		IAVLNode leftNode = node.getLeft();
+   		AVLTree biggersTree = new AVLTree(rightNode);
+   		AVLTree smallersTree = new AVLTree(leftNode);
+   		while (!isRoot(node)) {
+   			if (this.isLeftSon(node)) {
+   				AVLTree.IAVLNode scratchParentNode = this.new AVLNode(node.getParent().getKey(), node.getParent().getValue(), this.VIRTUAL_NODE, this.VIRTUAL_NODE, null);
+   				AVLTree newBiggers = new AVLTree(node.getParent().getRight());
+   				biggersTree.join(scratchParentNode, newBiggers);
+   				if (biggersTree.root.getHeight() < newBiggers.root.getHeight()) {
+   					biggersTree.root = newBiggers.root;
+   				}
+   			}	
+   			else {
+   				AVLTree.IAVLNode scratchParentNode = this.new AVLNode(node.getParent().getKey(), node.getParent().getValue(), this.VIRTUAL_NODE, this.VIRTUAL_NODE, null);
+   				AVLTree newSmallers = new AVLTree(node.getParent().getLeft());
+   				smallersTree.join(scratchParentNode, newSmallers);
+   				if (smallersTree.root.getHeight() < newSmallers.root.getHeight()) {
+   					smallersTree.root = newSmallers.root;
+   				}
+   			}
+   			node = node.getParent();
+   		}
+   		return new AVLTree[] {smallersTree, biggersTree};
+   	}
    
-   /*
-    * Helper function for join().
-    * Re-balances the tree upwards and returns the number of re-balance operations.
-    * Complexity O(|tree.rank - t.rank| + 1)
-    */
-   private int joinRebalance(IAVLNode node) {
-	   IAVLNode p = node.getParent();
-	   if (p == null) { // If node == root, we're done
-		   return 0;
-	   }
-	   if (node.getHeight() != p.getHeight()) { // If we're in balance, we're done
-		   fieldCorrect(p); // Correct size of parent.
-		   return insertRebalance(p); // Problem solved, climbing up to fix sizes.
-	   }
-	   else {
-		   // Get the sibling of the node
-		   IAVLNode other;
-		   if (p.getLeft() == node) {
-			   other = p.getRight();
-		   }
-		   else {
-			   other = p.getLeft();
-		   }
-		   // If parent is (0,1)/(1,0), or if parent is (0,2)/(2,0) node is (1,2)/(2,1), use insertRebalance()
-		   if (p.getHeight() == other.getHeight() + 1 || (p.getHeight() == other.getHeight() + 2 &&
-				   !(node.getLeft().getHeight() == node.getRight().getHeight()))) {
-			   fieldCorrect(node);
-			   return insertRebalance(node);
-		   }
-		   else { // Otherwise, rotate on the node and promote it, than continue fixing up
-			   rotate(node);
-			   return 2 + joinRebalance(node);
-		   }
-	   }
-   }   
+   	/*
+   	 * Helper function for join().
+   	 * Re-balances the tree upwards and returns the number of re-balance operations.
+   	 * Complexity O(|tree.rank - t.rank| + 1)
+   	 */
+   	private int joinRebalance(IAVLNode node) {
+   		IAVLNode parent = node.getParent();
+   		if (parent == null) { // If node == root, we're done
+   			return 0;
+   		}
+   		if (node.getHeight() != parent.getHeight()) { // If we're in balance, we're done
+   			fieldCorrect(parent); // Correct size of parent.
+   			return insertRebalance(parent); // Problem solved, climbing up to fix sizes.
+   		}
+   		else {
+   			// Get the sibling of the node
+   			IAVLNode other;
+   			if (parent.getLeft() == node) {
+   				other = parent.getRight();
+   			}
+   			else {
+   				other = parent.getLeft();
+   			}
+   			// If parent is (0,1)/(1,0), or if parent is (0,2)/(2,0) node is (1,2)/(2,1), use insertRebalance()
+   			if (parent.getHeight() == other.getHeight() + 1 || (parent.getHeight() == other.getHeight() + 2 &&
+   					!(node.getLeft().getHeight() == node.getRight().getHeight()))) {
+   				fieldCorrect(node);
+   				return insertRebalance(node);
+   			}
+   			else { // Otherwise, rotate on the node and promote it, than continue fixing up
+   				rotate(node);
+   				return 2 + joinRebalance(node);
+   			}
+   		}
+   	}   
    
-   /**
-    * public int join(IAVLNode x, AVLTree t)
-    *
-    * joins t and x with the tree. 	
-    * Returns the complexity of the operation (|tree.rank - t.rank| + 1).
-	*
-	* precondition: keys(t) < x < keys() or keys(t) > x > keys(). t/tree might be empty (rank = -1).
-    * postcondition: none
-    * Complexity O(|tree.rank - t.rank| + 1).
-    */   
-   public int join(IAVLNode x, AVLTree t)
-   {
-	   if (this.root.getHeight() < t.root.getHeight()) { // We want tree to have the greater rank.
-		   return t.join(x, this);
-	   }
-
-	   // Edge cases:
-	   if (this.empty() & t.empty()) { // This is an extreme edge case, counting "init." of tree with x 
-		   return 1; // Not actually creating a tree - we couldn't ref. it so it's a waste.
-	   }
-//	   if (this.empty()) { // Tree is empty - insert x to t.
-//		   return t.insert(x.getKey(), x.getValue());
-//	   }
-	   if (t.empty()) { // T is empty - insert x to tree.
-		   return this.insert(x.getKey(), x.getValue());
-	   }
-
-	   IAVLNode b = this.getRoot();
-	   IAVLNode a = t.getRoot();
-	   int cnt = 0;
-	   if (b.getKey() > x.getKey()) { // Bigger tree on right, smaller tree on left.
-		   // Get to the first node on the left vertex of tree whose rank isn't greater than the root of t
-
-		   if (this.nodeDistance(a, b) <= 1) {
-			   x.setLeft(a);
-			   x.setRight(b);
-			   a.setParent(x);
-			   b.setParent(x);
-			   x.setHeight(b.getHeight() + 1);
-			   fieldCorrect(x);
-			   this.root = x;
-			   if (this.nodeDistance(a, b) == 1) {
-				   return 2;
-			   }
-			   else {
-				   return 1;
-			   }
-
-		   }
-
-		   while (b.getHeight() > a.getHeight()) {
-			   b = b.getLeft();
-			   cnt++;
-		   }
-		   // Fix pointer of the tree nodes, and fix height of x
-		   x.setParent(b.getParent());
-		   x.setLeft(a);
-		   a.setParent(x);
-		   b.getParent().setLeft(x);
-		   x.setRight(b);
-		   b.setParent(x);
-		   x.setHeight(Math.max(a.getHeight(), b.getHeight())+1);
-	   }
-	   else { // Bigger tree on left, smaller tree on right.
-		   // Get to the first node on the right vertex of tree whose rank isn't greater than the root of t
-
-		   if (this.nodeDistance(a, b) <= 1) {
-			   x.setLeft(b);
-			   x.setRight(a);
-			   a.setParent(x);
-			   b.setParent(x);
-			   x.setHeight(b.getHeight() + 1);
-			   fieldCorrect(x);
-			   this.root = x;
-			   if (this.nodeDistance(a, b) == 1) {
-				   return 2;
-			   }
-			   else {
-				   return 1;
-			   }
-		   }
-
-		   while (b.getHeight() > a.getHeight()) {
-			   b = b.getRight();
-			   cnt++;
-		   }
-		   // Fix pointer of the tree nodes, and fix height of x
-		   x.setParent(b.getParent());
-		   x.setRight(a);
-		   a.setParent(x);
-		   b.getParent().setRight(x);
-		   x.setLeft(b);
-		   b.setParent(x);
-		   x.setHeight(Math.max(a.getHeight(), b.getHeight())+1);
-	   }
-	   // Correct sizes and re-balance if needed
-	   this.fieldCorrect(x);
-	   this.joinRebalance(x);
-	   return cnt;	   
-   }
-   
-   
-   /*
-    *  Function for the 1st experimental question.
-    *  Inserts a new element into the tree from the maximum of the tree.
-    *  Returns # of search ops. - diff of ranks between max and the common parent + diff of ranks
-    *  between common parent and inserted node.
-    *  @pre - inserted key is not in tree.
-    *  Time complexity is O(logn).
-    */
-   private int insertFromMax(int k, String i) {
-	   if (this.empty()) {
-		   return this.insert(k, i);
-	   }
-	   IAVLNode parent = this.root.getMax(); // Start from the max.
-	   int maxRank = parent.getHeight(); // Record height of max.
-	   while (parent.getKey() > k) { // Keep climbing until finding a common parent for max and the new node.
-		   if (this.getRoot() == parent) { // Handle edge case when entering a node smaller than the root.
-			   break;
-		   }
-		   parent = parent.getParent();
-	   }
-	   int commonParentRank = parent.getHeight(); // Record height of common parent.
-	   parent = this.nodeSearch(k, parent); // Find insertion point for the new node.
-	   IAVLNode child = new AVLNode(k, i, VIRTUAL_NODE, VIRTUAL_NODE, parent); // Create the node
-	   if (parent.getKey() > k) { // Insert on the left.
-		   parent.setLeft(child);
-	   }
-	   else {
-		   parent.setRight(child); // Insert on the right. 
-	   }
-	   this.insertRebalance(child); // Re-balance the tree and validates fields of nodes.
-	   return 2 * commonParentRank - maxRank; // Return length of the path between max and the new node.
-   }
+   	/*
+   	 * public int join(IAVLNode x, AVLTree t)
+   	 *
+   	 * joins t and x with the tree. 	
+   	 * Returns the complexity of the operation (|tree.rank - t.rank| + 1).
+   	 *
+   	 * precondition: keys(t) < x < keys() or keys(t) > x > keys(). t/tree might be empty (rank = -1).
+   	 * postcondition: none
+   	 * Complexity O(|tree.rank - t.rank| + 1).
+   	 */   
+   	public int join(IAVLNode x, AVLTree t)
+   	{
+   		if (this.root.getHeight() < t.root.getHeight()) { // We want tree to have the greater rank.
+   			return t.join(x, this);
+   		}
+   		// Edge cases:
+   		if (this.empty() & t.empty()) { // This is an extreme edge case, counting "init." of tree with x 
+   			return 1; // Not actually creating a tree - we couldn't ref. it so it's a waste.
+   		}
+   		if (t.empty()) { // T is empty - insert x to tree.
+   			int cost = this.root.getHeight();
+   			this.insert(x.getKey(), x.getValue());
+   			return cost + 1;
+   		}
+   		IAVLNode b = this.getRoot();
+   		IAVLNode a = t.getRoot();
+   		int cost = b.getHeight() - a.getHeight();
+   		if (b.getKey() > x.getKey()) { // Bigger tree on right, smaller tree on left.
+   			// Get to the first node on the left vertex of tree whose rank isn't greater than the root of t
+   			if (this.nodeDistance(a, b) <= 1) {
+   				x.setLeft(a);
+   				x.setRight(b);
+   				a.setParent(x);
+   				b.setParent(x);
+   				x.setHeight(b.getHeight() + 1);
+   				fieldCorrect(x);
+   				this.root = x;
+   				return cost + 1;
+   			}
+   			while (b.getHeight() > a.getHeight()) {
+   				b = b.getLeft();
+   			}
+   			// Fix pointer of the tree nodes, and fix height of x
+   			x.setParent(b.getParent());
+   			x.setLeft(a);
+   			a.setParent(x);
+   			b.getParent().setLeft(x);
+   			x.setRight(b);
+   			b.setParent(x);
+   			x.setHeight(Math.max(a.getHeight(), b.getHeight())+1);
+   		}
+   		else { // Bigger tree on left, smaller tree on right.
+   			// Get to the first node on the right vertex of tree whose rank isn't greater than the root of t
+   			if (this.nodeDistance(a, b) <= 1) {
+   				x.setLeft(b);
+   				x.setRight(a);
+   				a.setParent(x);
+   				b.setParent(x);
+   				x.setHeight(b.getHeight() + 1);
+   				fieldCorrect(x);
+   				this.root = x;
+   				return cost + 1;
+   			}
+   			while (b.getHeight() > a.getHeight()) {
+   				b = b.getRight();
+   			}
+   			// Fix pointer of the tree nodes, and fix height of x
+   			x.setParent(b.getParent());
+   			x.setRight(a);
+   			a.setParent(x);
+   			b.getParent().setRight(x);
+   			x.setLeft(b);
+   			b.setParent(x);
+   			x.setHeight(Math.max(a.getHeight(), b.getHeight())+1);
+   		}
+   		// Correct sizes and re-balance if needed
+   		this.fieldCorrect(x);
+   		this.joinRebalance(x);
+   		return cost + 1;	   
+   	}
    
    	/** 
 	 * public interface IAVLNode
@@ -955,25 +847,24 @@ public class AVLTree {
     	public IAVLNode getMax(); // Returns the maximal node in the sub-tree rooted by this.
 	}
 
-   /** 
-    * public class AVLNode
-    *
-    * If you wish to implement classes other than AVLTree
-    * (for example AVLNode), do it in this file, not in another file. 
-    * 
-    * This class can and MUST be modified (It must implement IAVLNode).
-    */
-  public class AVLNode implements IAVLNode{
-	  	/* Each node holds a key, a value, its height, its size, its sons and its parent.
-	  	 * height(node) = max(height(left), height(right)) + 1
+	/** 
+	 * public class AVLNode
+	 *
+	 * If you wish to implement classes other than AVLTree
+	 * (for example AVLNode), do it in this file, not in another file. 
+	 * 
+	 * This class can and MUST be modified (It must implement IAVLNode).
+	 */
+	public class AVLNode implements IAVLNode{
+		/* Each node holds a key, a value, its height, its size, its sons and its parent.
+		 * height(node) = max(height(left), height(right)) + 1
 		 * size(node) = 1 + size(left) + size(right)
 	  	 * Each node also holds the minimal and maximal nodes of its sub-tree.
 	  	 */
 	  	int key, height, size;  
 		String value;
 		IAVLNode left, right, parent, min, max;
-		
-		
+
 		/*
 		 * A constructor for an AVLNode. O(1) complexity.
 		 * Special case - the node is virtual (hence its size is 0, its height is -1 and
@@ -984,13 +875,13 @@ public class AVLTree {
 			this.right = r;
 			this.parent = p;
 			this.min = this.max = this;
-			if (l == null && r == null) { // TODO: Check with yoni why only one '&'?
+			if (l == null && r == null) {
 				this.height = -1;
 				this.key = -1;
 				this.size = 0;
 			}
 			else {
-				this.height = Math.max(l.getHeight(), r.getHeight()) + 1; // TODO: what if one of r or l is null
+				this.height = Math.max(l.getHeight(), r.getHeight()) + 1;
 				this.size = 1 + l.getSize() + r.getSize();
 				this.key = k; // TODO: what if k is null
 				this.value = v;
@@ -1130,67 +1021,10 @@ public class AVLTree {
 		public IAVLNode getMax() {
 			return this.max;
 		}
+	}
+	
+	public static void main(String[] args) {
 		
-  }
-
-	static void print_mat(String[][] mat) {
-		int height = mat.length;
-		int width = mat[0].length;
-		for (int i = 0; i < height; i++) {
-			for (int j = 0; j < width; j++) {
-				if (mat[i][j] != null) {
-					System.out.print(mat[i][j]);
-				} else {
-					System.out.print(" ");
-				}
-				//System.out.print(mat[i][j] + " ");
-			}
-			System.out.println();
-
-		}
 	}
-
-	static void fill_mat(AVLTree.IAVLNode root, String[][] mat, int i, int j) {
-		if (!root.isRealNode()) {
-			return;
-		}
-		int height = root.getHeight() + 1;
-		int width = 6 * (int) Math.pow(2, height);
-		mat[i][j + width / 2] = Integer.toString(root.getKey());
-		fill_mat(root.getLeft(), mat, i + 2, j);
-		fill_mat(root.getRight(), mat, i + 2, j - 1 + width / 2);
-	}
-
-	static void print_tree(AVLTree tree) {
-		if (tree.empty()) {
-			System.out.println("empty tree lol");
-			return;
-		}
-		AVLTree.IAVLNode root = tree.getRoot();
-		int height = root.getHeight() + 1;
-		int width = 6 * (int) Math.pow(2, height);
-		String[][] mat = new String[2 * height][width];
-		fill_mat(root, mat, 0, 0);
-		print_mat(mat);
-
-	}
-
-	/** Given array with Integers return its exchanges number */
-	static int exnum(int [] array) {
-		int count = 0;
-		for (int i=array.length - 1; i > 0; i--) {
-			for (int j= i-1; j >= 0; j --) {
-				if (array [i] < array[j]) {
-					count ++;
-				}
-			}
-		}
-		return count;
-	}
-
-  public static void main(String [] args) {
-	 
-  }
-
 }
   
