@@ -86,11 +86,11 @@ public class AVLTree {
 	}
 
 	private boolean isUnaryRight(IAVLNode targetNode) {
-	  return this.isVirtual(targetNode.getRight()) && !this.isVirtual(targetNode.getLeft());
+	  return !this.isVirtual(targetNode.getRight()) && this.isVirtual(targetNode.getLeft());
 	}
 
 	private boolean isUnaryLeft(IAVLNode targetNode) {
-		return !this.isVirtual(targetNode.getRight()) && this.isVirtual(targetNode.getLeft());
+		return this.isVirtual(targetNode.getRight()) && !this.isVirtual(targetNode.getLeft());
 	}
 
 
@@ -1156,7 +1156,7 @@ public class AVLTree {
 		}
 		int height = root.getHeight() + 1;
 		int width = 6 * (int) Math.pow(2, height);
-		mat[i][j + width / 2] = Integer.toString(root.getKey());
+		mat[i][j + width / 2] = Integer.toString(root.getSize());
 		fill_mat(root.getLeft(), mat, i + 2, j);
 		fill_mat(root.getRight(), mat, i + 2, j - 1 + width / 2);
 	}
@@ -1189,7 +1189,48 @@ public class AVLTree {
 	}
 
   public static void main(String [] args) {
-	 
+
+
+
+
+
+
+
+
+//	 AVLTree t = new AVLTree();
+//	 for (int i=1; i <=15; i++) {
+//		 t.insertFromMax(i, "check");
+//	 }
+
+//	 print_tree(t);
+//	 System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+//	  System.out.println("Delete 15");
+//	 System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+//	 t.delete(15);
+//	 print_tree(t);
+//	 System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+//	  System.out.println("Delete 14");
+//	 System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+//	 t.delete(14);
+//	 print_tree(t);
+//	  System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+//	  System.out.println("Delete 10");
+//	  System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+//	 t.delete(10);
+//	 print_tree(t);
+//	  System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+//	  System.out.println("Delete 8");
+//	  System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+//	  t.delete(8);
+//	  print_tree(t);
+//	  System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+//	  System.out.println("Delete 4");
+//	  System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+//	  t.delete(4);
+//	  print_tree(t);
+//	  System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+//	  System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+
   }
 
 }
