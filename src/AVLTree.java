@@ -7,6 +7,13 @@
  *
  */
 
+import java.sql.SQLOutput;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 public class AVLTree {
 	IAVLNode VIRTUAL_NODE = new AVLNode(-1, null, null, null, null); // VE's parents won't be maintained
 	IAVLNode root;
@@ -705,6 +712,54 @@ public class AVLTree {
    		}
    		return new AVLTree[] {smallersTree, biggersTree};
    	}
+
+
+	public double[] splitCount(int x)
+	{
+		double maxNumber = 0;
+		double sumNumber = 0;
+		double count = 0;
+		double currNumber;
+		IAVLNode targetNode = this.nodeSearch(x, this.root);
+		IAVLNode rightNode = targetNode.getRight();
+		IAVLNode leftNode = targetNode.getLeft();
+		AVLTree biggersTree = new AVLTree(rightNode);
+		AVLTree smallersTree = new AVLTree(leftNode);
+
+		while (!isRoot(targetNode)) {
+			if (this.isLeftSon(targetNode)) {
+				AVLTree.IAVLNode scratchParentNode = this.new AVLNode(targetNode.getParent().getKey(), targetNode.getParent().getValue(), this.VIRTUAL_NODE, this.VIRTUAL_NODE, null);
+				AVLTree newBiggers = new AVLTree(targetNode.getParent().getRight());
+				currNumber = biggersTree.join(scratchParentNode, newBiggers);
+				sumNumber += currNumber;
+				count ++;
+				if (currNumber > maxNumber) {
+					maxNumber = currNumber;
+				}
+				if (biggersTree.root.getHeight() < newBiggers.root.getHeight()) {
+					biggersTree.root = newBiggers.root;
+				}
+			}
+
+			else {
+				AVLTree.IAVLNode scratchParentNode = this.new AVLNode(targetNode.getParent().getKey(), targetNode.getParent().getValue(), this.VIRTUAL_NODE, this.VIRTUAL_NODE, null);
+				AVLTree newSmallers = new AVLTree(targetNode.getParent().getLeft());
+				currNumber = smallersTree.join(scratchParentNode, newSmallers);
+				sumNumber += currNumber;
+				count ++;
+				if (currNumber > maxNumber) {
+					maxNumber = currNumber;
+				}
+				if (smallersTree.root.getHeight() < newSmallers.root.getHeight()) {
+					smallersTree.root = newSmallers.root;
+				}
+			}
+
+			targetNode = targetNode.getParent();
+		}
+
+		return new double[] {sumNumber / count, maxNumber};
+	}
    
    	/*
    	 * Helper function for join().
@@ -822,6 +877,45 @@ public class AVLTree {
    		this.joinRebalance(x);
    		return cost + 1;	   
    	}
+
+	private int insertFromMax(int k, String i) {
+	    int count = 0;
+	    if (this.empty()) {
+			insert(k, i);
+			return 1;
+		}
+
+		if (this.root.getMax().getKey() < k) { // edge case if k bigger then max
+			this.insert(k ,i);
+			return 1;
+		}
+
+		IAVLNode targetNode = this.root.getMax();
+		while (!this.isRoot(targetNode) && targetNode.getKey() > k) {
+			targetNode = targetNode.getParent();
+			count ++;
+		}
+
+		if (targetNode.getKey() < k) {
+			targetNode = targetNode.getRight();
+			count --;
+		}
+
+		while (targetNode.isRealNode()) {
+			if (targetNode.getKey() > k) {
+				targetNode = targetNode.getLeft();
+			}
+
+			else {
+				targetNode = targetNode.getRight();
+			}
+			count ++;
+		}
+
+		this.insert(k, i);
+		return count;
+
+	}
    
    	/** 
 	 * public interface IAVLNode
@@ -1021,10 +1115,146 @@ public class AVLTree {
 		public IAVLNode getMax() {
 			return this.max;
 		}
+
+	}
+
+	static void print_mat(String[][] mat) {
+		int height = mat.length;
+		int width = mat[0].length;
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				if (mat[i][j] != null) {
+					System.out.print(mat[i][j]);
+				} else {
+					System.out.print(" ");
+				}
+				//System.out.print(mat[i][j] + " ");
+			}
+			System.out.println();
+
+		}
+	}
+
+	static void fill_mat(AVLTree.IAVLNode root, String[][] mat, int i, int j) {
+		if (!root.isRealNode()) {
+			return;
+		}
+		int height = root.getHeight() + 1;
+		int width = 6 * (int) Math.pow(2, height);
+		mat[i][j + width / 2] = Integer.toString(root.getKey());
+		fill_mat(root.getLeft(), mat, i + 2, j);
+		fill_mat(root.getRight(), mat, i + 2, j - 1 + width / 2);
+	}
+
+	static void print_tree(AVLTree tree) {
+		if (tree.empty()) {
+			System.out.println("empty tree lol");
+			return;
+		}
+		AVLTree.IAVLNode root = tree.getRoot();
+		int height = root.getHeight() + 1;
+		int width = 6 * (int) Math.pow(2, height);
+		String[][] mat = new String[2 * height][width];
+		fill_mat(root, mat, 0, 0);
+		print_mat(mat);
+
+	}
+
+	/** Given array with Integers return its exchanges number */
+	static int exnum(List<Integer> list) {
+		int count = 0;
+		for (int i=list.size() - 1; i > 0; i--) {
+			for (int j= i-1; j >= 0; j --) {
+				if (list.get(i) < list.get(j)) {
+					count ++;
+				}
+			}
+		}
+		return count;
+	}
+
+	static int [] q1(List<Integer> list) {
+		AVLTree tree = new AVLTree();
+		int sum = 0;
+		for (int i=0; i < list.size(); i ++) {
+			sum += tree.insertFromMax(list.get(i), "");
+		}
+		return new int[] {sum, exnum(list)};
+	}
+
+	static double [] q2(List<Integer> arr) {
+		AVLTree t1 = new AVLTree();
+		for (int n:arr) {
+			t1.insert(n, null);
+		}
+		int randKey = new Random().nextInt(arr.size());
+		double[] test1 = t1.splitCount(randKey);
+
+		AVLTree t2 = new AVLTree();
+		for (int n:arr) {
+			t2.insert(n, null);
+		}
+		int maxKey = t2.getRoot().getLeft().getMax().getKey();
+		double[] test2 = t2.splitCount(maxKey);
+		double[] res = new double[4];
+		res[0] = test1[0];
+		res[1] = test1[1];
+		res[2] = test2[0];
+		res[3] = test2[1];
+		return res;
 	}
 	
 	public static void main(String[] args) {
-		
+//		List<Integer> l = new ArrayList<>();
+//		for (int i = 1; i <= 10; i++) {
+//			for (int j=1000*((int)Math.pow(2, i)); j > 0 ; j--) {
+//				l.add(j);
+//			}
+//			java.util.Collections.shuffle(l);
+//			double[] res = q2(l);
+//			System.out.println(1000*((int)Math.pow(2, i)));
+//			System.out.println("random key average:" + res[0]);
+//			System.out.println("random key maximal:" + res[1]);
+//			System.out.println("------------------------------");
+//			System.out.println("left maximal key average:" + res[2]);
+//			System.out.println("left maximal key maximal:" + res[3]);
+//			System.out.println();
+//		}
+
+
+
+//	int [] values1;
+//	int [] values2;
+//	for (int i=1; i <= 5; i++) {
+//		List<Integer> list = new ArrayList<>();
+//		for (int j=1000*((int)Math.pow(2, i)); j > 0 ; j--) {
+//			list.add(j);
+//		}
+//		System.out.println("----------------------------------------------------------------------------------------------------");
+//		System.out.println("i is equal to: "+ i);
+//		System.out.println("n =  " + 1000*((int)Math.pow(2, i)));
+//		System.out.println("----------------------------------------------------------------------------------------------------");
+//		System.out.println("This is decreasing list");
+//		values1 = q1(list);
+////		System.out.println(Arrays.toString(list.toArray()));
+//		System.out.println("Value of the avl is: " + values1[0]);
+//		System.out.println("Value of the array exchanges is: " + values1[1]);
+//		System.out.println("----------------------------------------------------------------------------------------------------");
+//		System.out.println("----------------------------------------------------------------------------------------------------");
+//		System.out.println("----------------------------------------------------------------------------------------------------");
+//		java.util.Collections.shuffle(list);
+////		System.out.println(Arrays.toString(list.toArray()));
+//		values2 = q1(list);
+//		System.out.println("This is shuffled list");
+//		System.out.println("Value of the avl is: " + values2[0]);
+//		System.out.println("Value of the array exchanges is: " + values2[1]);
+//		System.out.println("----------------------------------------------------------------------------------------------------");
+//		System.out.println("----------------------------------------------------------------------------------------------------");
+//
+//
+//	}
+
+
 	}
 }
   
