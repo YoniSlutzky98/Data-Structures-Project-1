@@ -85,12 +85,12 @@ public class AVLTree {
 		return targetNode.getParent() == null;
 	}
 
-	private boolean isUnaryRight(IAVLNode targetNode) { // Which one needs to exist?
-	  return this.isVirtual(targetNode.getRight()) && this.isVirtual(targetNode.getLeft());
+	private boolean isUnaryRight(IAVLNode targetNode) {
+	  return this.isVirtual(targetNode.getRight()) && !this.isVirtual(targetNode.getLeft());
 	}
 
-	private boolean isUnaryLeft(IAVLNode targetNode) { // Which one needs to exist?
-		return this.isVirtual(targetNode.getRight()) && this.isVirtual(targetNode.getLeft());
+	private boolean isUnaryLeft(IAVLNode targetNode) {
+		return !this.isVirtual(targetNode.getRight()) && this.isVirtual(targetNode.getLeft());
 	}
 
 
@@ -405,7 +405,7 @@ public class AVLTree {
    * successor and bypass its original place in the tree (unary node).
    */
    public int delete(int k) {
-	   if (this.isVirtual(this.root)) { // Special case when the tree is empty.
+	   if (this.empty()) { // Special case when the tree is empty.
 		   return -1;
 	   }
 
@@ -1189,7 +1189,7 @@ public class AVLTree {
 	}
 
   public static void main(String [] args) {
-	  
+	 
   }
 
 }
