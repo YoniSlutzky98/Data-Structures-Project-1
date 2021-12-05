@@ -608,6 +608,7 @@ public class AVLTree {
    		int[] arr = new int[this.root.getSize()];
    		this.inorderKeys(this.root, arr, 0);
    		return arr;
+   		
    	}
  
    	/*
@@ -741,6 +742,7 @@ public class AVLTree {
    			}
    			else { // Otherwise, rotate on the node and promote it, than continue fixing up
    				rotate(node);
+   				fieldCorrect(node);
    				return 2 + joinRebalance(node);
    			}
    		}
@@ -887,7 +889,7 @@ public class AVLTree {
 			else {
 				this.height = Math.max(l.getHeight(), r.getHeight()) + 1;
 				this.size = 1 + l.getSize() + r.getSize();
-				this.key = k; // TODO: what if k is null
+				this.key = k;
 				this.value = v;
 			}
 		}
@@ -1026,8 +1028,6 @@ public class AVLTree {
 			return this.max;
 		}
 	}
-	
 	public static void main(String[] args) {
-		
 	}
 }
