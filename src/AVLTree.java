@@ -1,5 +1,3 @@
-import sun.reflect.generics.tree.Tree;
-
 /**
  *
  * AVLTree
@@ -25,7 +23,7 @@ public class AVLTree {
 	}
 
 	public boolean isVirtual(IAVLNode node) {
-		return node.getHeight() == -1 && node.getKey() == -1;
+		return node.getKey() == -1;
 	}
 	
   /**
@@ -242,7 +240,7 @@ public class AVLTree {
 					}
 				}
 			}
-			else { // If the inserted node was to the left
+			else { // If the inserted node was to the right
 				IAVLNode other = p.getLeft();
 				if (p.getHeight() == other.getHeight() + 1) { // If the other node has a diff. of 1
 					p.setHeight(p.getHeight() + 1); // Promote parent and re-balance upwards
@@ -623,7 +621,7 @@ public class AVLTree {
 	   }
 	   arr[pointer] = node.getValue();
 	   pointer++;
-	   if (this.isVirtual(node.getRight())) {
+	   if (!this.isVirtual(node.getRight())) {
 		   pointer = this.inorderValues(node.getRight(), arr, pointer);
 	   }
 	   return pointer;
@@ -1179,140 +1177,7 @@ public class AVLTree {
 	}
 
   public static void main(String [] args) {
-//	  AVLTree myTree = new AVLTree();
-//	  myTree.insert(1, "hello");
-//	  myTree.insert(4, "hello");
-//	  myTree.insert(7, "hello");
-//	  myTree.insert(3, "asd");
-//	  myTree.insert(0, "asd");
-//	  myTree.insert(2, "asd");
-//	  myTree.insert(8, "asd");
-//
-//	  AVLTree myTree2 = new AVLTree();
-//	  myTree2.insert(10, "hello");
-//	  myTree2.insert(40, "hello");
-//	  myTree2.insert(70, "hello");
-//	  myTree2.insert(30, "asd");
-//	  myTree2.insert(50, "asd");
-//	  myTree2.insert(20, "asd");
-//	  myTree2.insert(80, "asd");
-//	  myTree2.insert(100, "hello");
-//	  myTree2.insert(400, "hello");
-//	  myTree2.insert(700, "hello");
-//	  myTree2.insert(300, "asd");
-//	  myTree2.insert(500, "asd");
-//	  myTree2.insert(200, "asd");
-//	  myTree2.insert(800, "asd");
-//
-//
-//
-//	  print_tree(myTree);
-//	  System.out.println(" --------------------- ");
-//	  System.out.println(" --------------------- ");
-//	  print_tree(myTree2);
-//	  System.out.println(" --------------------- ");
-//	  System.out.println(" --------------------- ");
-//
-//	  AVLTree.IAVLNode node = myTree.new AVLNode(9, "check", myTree.VIRTUAL_NODE, myTree.VIRTUAL_NODE, null);
-//
-//	  myTree.join(node, myTree2);
-//	  System.out.println(" --------------------- ");
-//	  System.out.println(" --------------------- ");
-//
-//	  print_tree(myTree);
-//	  System.out.println(" --------------------- ");
-//	  System.out.println(" --------------------- ");
-//	  print_tree(myTree2);
-//	  System.out.println(" --------------------- ");
-//	  System.out.println(" --------------------- ");
-//
-//
-//
-//	  print_tree(myTree2.split(20)[0]);
-
-
-
-
-
-
-	  AVLTree myTree = new AVLTree();
-	  myTree.insert(1, "hello");
-	  myTree.insert(4, "hello");
-	  myTree.insert(7, "hello");
-	  myTree.insert(3, "asd");
-	  myTree.insert(0, "asd");
-	  myTree.insert(2, "asd");
-	  myTree.insert(8, "asd");
-
-	  AVLTree myTree2 = new AVLTree();
-	  myTree2.insert(10, "hello");
-	  myTree2.insert(40, "hello");
-	  myTree2.insert(70, "hello");
-	  myTree2.insert(30, "asd");
-	  myTree2.insert(50, "asd");
-
-	  print_tree(myTree);
-	  System.out.println(" --------------------- ");
-	  System.out.println(" --------------------- ");
-	  print_tree(myTree2);
-	  System.out.println(" --------------------- ");
-	  System.out.println(" --------------------- ");
-	  AVLTree.IAVLNode node = myTree.new AVLNode(9, "check", myTree.VIRTUAL_NODE, myTree.VIRTUAL_NODE, null);
-
-	  myTree.join(node, myTree2);
-	  print_tree(myTree);
-	  System.out.println(" --------------------- ");
-	  System.out.println(" --------------------- ");
-	  AVLTree[] myList= myTree.split(7);
-	  System.out.println(" --------------------- ");
-	  System.out.println(" --------------------- ");
-	  print_tree(myTree);
-	  System.out.println(" --------------------- ");
-	  System.out.println(" --------------------- ");
-	  print_tree(myList[0]);
-	  System.out.println(" --------------------- ");
-	  System.out.println(" --------------------- ");
-	  print_tree(myList[1]);
-	  System.out.println(" --------------------- ");
-	  System.out.println(" --------------------- ");
-
-//	  System.out.println(myTree.splitCount(30)[1]);
-
-//	  System.out.println(myTree.splitCount(7)[0]);
-////	  System.out.println(myTree.splitCount(7)[1]);
-//	  print_tree(myTree);
-
-
-//	  print_tree(myTree.split(1)[1]);
-//	  System.out.println(" --------------------- ");
-//	  System.out.println(" --------------------- ");
-
-
-
-
-
-//	  myTree.insertFromMax(1, "hello");
-//	  myTree.insertFromMax(4, "hello");
-//	  myTree.insertFromMax(7, "hello");
-//	  myTree.insertFromMax(10, "hello");
-//	  myTree.insertFromMax(14, "hello");
-//	  myTree.insertFromMax(70, "hello");
-//	  myTree.insertFromMax(0, "hello");
-//	  myTree.insertFromMax(2, "hello");
-//	  myTree.insertFromMax(3, "hello");
-//	  print_tree(myTree);
-//	  AVLTree myTree1 = new AVLTree();
-//	  myTree1.insertFromMax(1, "hello");
-//	  myTree1.insertFromMax(4, "hello");
-//	  myTree1.insertFromMax(7, "hello");
-//	  myTree1.insertFromMax(10, "hello");
-//	  myTree1.insertFromMax(14, "hello");
-//	  myTree1.insertFromMax(70, "hello");
-//	  myTree1.insertFromMax(0, "hello");
-//	  myTree1.insertFromMax(2, "hello");
-//	  myTree1.insertFromMax(3, "hello");
-//	  print_tree(myTree1);
-  
+	  
   }
 
 }
