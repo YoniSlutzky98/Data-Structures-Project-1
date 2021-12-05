@@ -1,3 +1,7 @@
+import java.util.Random;
+import java.util.Collections;
+import java.util.List;
+import java.util.ArrayList;
 /**
  *
  * AVLTree
@@ -366,7 +370,7 @@ public class AVLTree {
 
 	   else if (leftDiff == 3 && rightDiff == 1) { // The base case is (3,1)
 		   IAVLNode rightRightNode = rightNode.getRight();
-		   IAVLNode rightLeftNode = rightNode.getRight();
+		   IAVLNode rightLeftNode = rightNode.getLeft();
 
 		   int rightRightDiff = nodeDistance(rightNode, rightRightNode);
 		   int rightLeftDiff = nodeDistance(rightNode, rightLeftNode);
@@ -1027,4 +1031,3 @@ public class AVLTree {
 		
 	}
 }
-  
