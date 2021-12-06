@@ -786,17 +786,25 @@ public class AVLTree {
    				this.root = x;
    				return cost + 1;
    			}
-   			while (b.getHeight() > a.getHeight()) {
+   			while (b.getHeight() > a.getHeight() && b.getLeft() != VIRTUAL_NODE) {
    				b = b.getLeft();
    			}
-   			// Fix pointer of the tree nodes, and fix height of x
-   			x.setParent(b.getParent());
+   			if (b.getHeight() <= a.getHeight()) {
+   				// Fix pointer of the tree nodes, and fix height of x
+   				x.setParent(b.getParent());
+   				b.getParent().setLeft(x);
+   				x.setRight(b);
+   				b.setParent(x);
+   				x.setHeight(Math.max(a.getHeight(), b.getHeight())+1);
+   			}
+   			else { // Edge case when b is a (2,1) node with a virtual left son
+   				x.setParent(b);
+   				b.setLeft(x);
+   				x.setRight(VIRTUAL_NODE);
+   				x.setHeight(a.getHeight() + 1);
+   			}
    			x.setLeft(a);
-   			a.setParent(x);
-   			b.getParent().setLeft(x);
-   			x.setRight(b);
-   			b.setParent(x);
-   			x.setHeight(Math.max(a.getHeight(), b.getHeight())+1);
+			a.setParent(x);
    		}
    		else { // Bigger tree on left, smaller tree on right.
    			// Get to the first node on the right vertex of tree whose rank isn't greater than the root of t
@@ -811,17 +819,25 @@ public class AVLTree {
    				this.root = x;
    				return cost + 1;
    			}
-   			while (b.getHeight() > a.getHeight()) {
+   			while (b.getHeight() > a.getHeight() && b.getRight() != VIRTUAL_NODE) {
    				b = b.getRight();
    			}
-   			// Fix pointer of the tree nodes, and fix height of x
-   			x.setParent(b.getParent());
+   			if (b.getHeight() <= a.getHeight()) {
+   				// Fix pointer of the tree nodes, and fix height of x
+   				x.setParent(b.getParent());
+   				b.getParent().setRight(x);
+   				x.setLeft(b);
+   				b.setParent(x);
+   				x.setHeight(Math.max(a.getHeight(), b.getHeight())+1);
+   			}
+   			else { // Edge case when b is a (1,2) node with a virtual right son
+   				x.setParent(b);
+   				b.setRight(x);
+   				x.setLeft(VIRTUAL_NODE);
+   				x.setHeight(a.getHeight()+1);
+   			}
    			x.setRight(a);
    			a.setParent(x);
-   			b.getParent().setRight(x);
-   			x.setLeft(b);
-   			b.setParent(x);
-   			x.setHeight(Math.max(a.getHeight(), b.getHeight())+1);
    		}
    		// Correct sizes and re-balance if needed
    		this.fieldCorrect(x);
