@@ -782,6 +782,7 @@ public class AVLTree {
    				b.setParent(x);
    				x.setHeight(b.getHeight() + 1);
    				fieldCorrect(x);
+   				x.setParent(null);
    				this.root = x;
    				return cost + 1;
    			}
@@ -806,6 +807,7 @@ public class AVLTree {
    				b.setParent(x);
    				x.setHeight(b.getHeight() + 1);
    				fieldCorrect(x);
+   				x.setParent(null);
    				this.root = x;
    				return cost + 1;
    			}
