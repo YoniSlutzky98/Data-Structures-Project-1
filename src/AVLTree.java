@@ -756,6 +756,11 @@ public class AVLTree {
    	 */   
    	public int join(IAVLNode x, AVLTree t)
    	{
+   		if (t == null) {
+   			int cost = this.root.getHeight();
+   			this.insert(x.getKey(), x.getValue());
+   			return cost + 1;
+   		}
    		if (this.root.getHeight() < t.root.getHeight()) { // We want tree to have the greater rank.
    			return t.join(x, this);
    		}
