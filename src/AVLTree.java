@@ -756,19 +756,16 @@ public class AVLTree {
    	 */   
    	public int join(IAVLNode x, AVLTree t)
    	{
-   		if (t == null) {
+   		// Edge cases:
+   		if (t == null) { // If t is null, insert into this
    			int cost = this.root.getHeight();
    			this.insert(x.getKey(), x.getValue());
    			return cost + 1;
    		}
-   		if (this.root.getHeight() < t.root.getHeight()) { // We want tree to have the greater rank.
+   		if (this.root.getHeight() < t.root.getHeight()) { // We want this to have the greater rank.
    			return t.join(x, this);
    		}
-   		// Edge cases:
-   		if (this.empty() & t.empty()) { // This is an extreme edge case, counting "init." of tree with x 
-   			return 1; // Not actually creating a tree - we couldn't ref. it so it's a waste.
-   		}
-   		if (t.empty()) { // T is empty - insert x to tree.
+   		if (t.empty()) { // If t is empty, insert into this
    			int cost = this.root.getHeight();
    			this.insert(x.getKey(), x.getValue());
    			return cost + 1;
@@ -778,7 +775,7 @@ public class AVLTree {
    		int cost = b.getHeight() - a.getHeight();
    		if (b.getKey() > x.getKey()) { // Bigger tree on right, smaller tree on left.
    			// Get to the first node on the left vertex of tree whose rank isn't greater than the root of t
-   			if (this.nodeDistance(a, b) <= 1) {
+   			if (this.nodeDistance(a, b) == 0) {
    				x.setLeft(a);
    				x.setRight(b);
    				a.setParent(x);
@@ -802,7 +799,7 @@ public class AVLTree {
    		}
    		else { // Bigger tree on left, smaller tree on right.
    			// Get to the first node on the right vertex of tree whose rank isn't greater than the root of t
-   			if (this.nodeDistance(a, b) <= 1) {
+   			if (this.nodeDistance(a, b) == 0) {
    				x.setLeft(b);
    				x.setRight(a);
    				a.setParent(x);
