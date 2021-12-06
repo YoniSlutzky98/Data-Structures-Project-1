@@ -786,7 +786,7 @@ public class AVLTree {
    				this.root = x;
    				return cost + 1;
    			}
-   			while (b.getHeight() > a.getHeight() && b.getLeft() != VIRTUAL_NODE) {
+   			while (b.getHeight() > a.getHeight() && !b.getLeft().isRealNode()) {
    				b = b.getLeft();
    			}
    			if (b.getHeight() <= a.getHeight()) {
@@ -819,7 +819,7 @@ public class AVLTree {
    				this.root = x;
    				return cost + 1;
    			}
-   			while (b.getHeight() > a.getHeight() && b.getRight() != VIRTUAL_NODE) {
+   			while (b.getHeight() > a.getHeight() && !b.getRight().isRealNode()) {
    				b = b.getRight();
    			}
    			if (b.getHeight() <= a.getHeight()) {
