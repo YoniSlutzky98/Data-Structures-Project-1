@@ -1205,54 +1205,54 @@ public class AVLTree {
 	}
 	
 	public static void main(String[] args) {
-//		List<Integer> l = new ArrayList<>();
-//		for (int i = 1; i <= 10; i++) {
-//			for (int j=1000*((int)Math.pow(2, i)); j > 0 ; j--) {
-//				l.add(j);
-//			}
-//			java.util.Collections.shuffle(l);
-//			double[] res = q2(l);
-//			System.out.println(1000*((int)Math.pow(2, i)));
-//			System.out.println("random key average:" + res[0]);
-//			System.out.println("random key maximal:" + res[1]);
-//			System.out.println("------------------------------");
-//			System.out.println("left maximal key average:" + res[2]);
-//			System.out.println("left maximal key maximal:" + res[3]);
-//			System.out.println();
-//		}
+		List<Integer> l = new ArrayList<>();
+		for (int i = 1; i <= 10; i++) {
+			for (int j=1000*((int)Math.pow(2, i)); j > 0 ; j--) {
+				l.add(j);
+			}
+			java.util.Collections.shuffle(l);
+			double[] res = q2(l);
+			System.out.println(1000*((int)Math.pow(2, i)));
+			System.out.println("random key average:" + res[0]);
+			System.out.println("random key maximal:" + res[1]);
+			System.out.println("------------------------------");
+			System.out.println("left maximal key average:" + res[2]);
+			System.out.println("left maximal key maximal:" + res[3]);
+			System.out.println();
+		}
 
 
 
-//	int [] values1;
-//	int [] values2;
-//	for (int i=1; i <= 5; i++) {
-//		List<Integer> list = new ArrayList<>();
-//		for (int j=1000*((int)Math.pow(2, i)); j > 0 ; j--) {
-//			list.add(j);
-//		}
-//		System.out.println("----------------------------------------------------------------------------------------------------");
-//		System.out.println("i is equal to: "+ i);
-//		System.out.println("n =  " + 1000*((int)Math.pow(2, i)));
-//		System.out.println("----------------------------------------------------------------------------------------------------");
-//		System.out.println("This is decreasing list");
-//		values1 = q1(list);
-////		System.out.println(Arrays.toString(list.toArray()));
-//		System.out.println("Value of the avl is: " + values1[0]);
-//		System.out.println("Value of the array exchanges is: " + values1[1]);
-//		System.out.println("----------------------------------------------------------------------------------------------------");
-//		System.out.println("----------------------------------------------------------------------------------------------------");
-//		System.out.println("----------------------------------------------------------------------------------------------------");
-//		java.util.Collections.shuffle(list);
-////		System.out.println(Arrays.toString(list.toArray()));
-//		values2 = q1(list);
-//		System.out.println("This is shuffled list");
-//		System.out.println("Value of the avl is: " + values2[0]);
-//		System.out.println("Value of the array exchanges is: " + values2[1]);
-//		System.out.println("----------------------------------------------------------------------------------------------------");
-//		System.out.println("----------------------------------------------------------------------------------------------------");
-//
-//
-//	}
+	int [] values1;
+	int [] values2;
+	for (int i=1; i <= 5; i++) {
+		List<Integer> list = new ArrayList<>();
+		for (int j=1000*((int)Math.pow(2, i)); j > 0 ; j--) {
+			list.add(j);
+		}
+		System.out.println("----------------------------------------------------------------------------------------------------");
+		System.out.println("i is equal to: "+ i);
+		System.out.println("n =  " + 1000*((int)Math.pow(2, i)));
+		System.out.println("----------------------------------------------------------------------------------------------------");
+		System.out.println("This is decreasing list");
+		values1 = q1(list);
+//		System.out.println(Arrays.toString(list.toArray()));
+		System.out.println("Value of the avl is: " + values1[0]);
+		System.out.println("Value of the array exchanges is: " + values1[1]);
+		System.out.println("----------------------------------------------------------------------------------------------------");
+		System.out.println("----------------------------------------------------------------------------------------------------");
+		System.out.println("----------------------------------------------------------------------------------------------------");
+		java.util.Collections.shuffle(list);
+//		System.out.println(Arrays.toString(list.toArray()));
+		values2 = q1(list);
+		System.out.println("This is shuffled list");
+		System.out.println("Value of the avl is: " + values2[0]);
+		System.out.println("Value of the array exchanges is: " + values2[1]);
+		System.out.println("----------------------------------------------------------------------------------------------------");
+		System.out.println("----------------------------------------------------------------------------------------------------");
+
+
+	}
 
 
 	}
