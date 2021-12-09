@@ -1236,14 +1236,12 @@ public class AVLTree {
 		System.out.println("----------------------------------------------------------------------------------------------------");
 		System.out.println("This is decreasing list");
 		values1 = q1(list);
-//		System.out.println(Arrays.toString(list.toArray()));
 		System.out.println("Value of the avl is: " + values1[0]);
 		System.out.println("Value of the array exchanges is: " + values1[1]);
 		System.out.println("----------------------------------------------------------------------------------------------------");
 		System.out.println("----------------------------------------------------------------------------------------------------");
 		System.out.println("----------------------------------------------------------------------------------------------------");
 		java.util.Collections.shuffle(list);
-//		System.out.println(Arrays.toString(list.toArray()));
 		values2 = q1(list);
 		System.out.println("This is shuffled list");
 		System.out.println("Value of the avl is: " + values2[0]);
