@@ -7,13 +7,5 @@ Done
 class AVLNode:
 Done
 
-Experiment:
-Section 1
-perform first experiment (generate random and reverse order arrays, count exchanges, count costs of insertFromMax)
-Section 2
-perform second experiment (generate random trees, take one random key and the maximal key on the left side, perform splits and record join data)
-Update and fill rest of the questions @ overleaf
-
 class Tester:
-clean up file
-Take and run
+Done
